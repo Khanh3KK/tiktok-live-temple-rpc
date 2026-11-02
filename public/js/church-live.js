@@ -1144,6 +1144,13 @@
       btnAutoSim.classList.toggle('active-toggle', Boolean(st.settings.autoSim));
     }
 
+    const btnGentle = document.getElementById('btnToggleGentleReply');
+    if (btnGentle && st.settings) {
+      const gentleOn = st.settings.autoGentleReply !== false;
+      btnGentle.textContent = gentleOn ? '🕊️ Tự Nhắc Lịch Sự: BẬT' : '🕊️ Tự Nhắc Lịch Sự: TẮT';
+      btnGentle.classList.toggle('active-toggle', gentleOn);
+    }
+
     if (st.settings && (typeof st.settings.massAutoSchedule === 'boolean' || Array.isArray(st.settings.massScheduleHours))) {
       audio.setMassSchedule(st.settings.massAutoSchedule, st.settings.massScheduleHours);
     }
@@ -1478,6 +1485,36 @@
               url: msg.params.url
             });
           }
+        } else if (msg.method === 'church.gentleReminder') {
+          if (msg.params?.url) {
+            audio.ttsEnabled = true;
+            if (audio.ttsVolume < 0.5) audio.ttsVolume = 0.88;
+            audio.enqueueTts(
+              msg.params.text ||
+                'Đây là không gian chia sẻ Kinh Thánh và lan tỏa Lời Chúa, xin mọi người cùng giữ lời nói hiền hòa. Amen.',
+              {
+                voice: msg.params.voice || 'kimoanh',
+                url: msg.params.url
+              }
+            );
+          }
+          const welcomeNamesEl = document.getElementById('welcomeTickerNames');
+          const welcomeBarEl = document.getElementById('welcomeTickerBar');
+          if (welcomeNamesEl) {
+            const prevText = welcomeNamesEl.textContent;
+            welcomeNamesEl.textContent =
+              '🕊️ Không gian chia sẻ Kinh Thánh & Lời Chúa • Xin cùng giữ lời nói hiền hòa';
+            welcomeBarEl?.classList.add('flash-welcome');
+            setTimeout(() => {
+              welcomeBarEl?.classList.remove('flash-welcome');
+              if (
+                welcomeNamesEl.textContent.includes('Không gian chia sẻ Kinh Thánh & Lời Chúa') &&
+                prevText
+              ) {
+                welcomeNamesEl.textContent = prevText;
+              }
+            }, 6000);
+          }
         } else if (msg.method === 'church.scriptureControl') {
           const p = msg.params || {};
           if (typeof p.enabled === 'boolean' && !isObsMode) {
@@ -1777,6 +1814,20 @@
   document.getElementById('btnToggleAutoSim')?.addEventListener('click', () => {
     autoSimState = !autoSimState;
     callRpc('church.setAutoSim', { enabled: autoSimState });
+  });
+
+  document.getElementById('btnToggleGentleReply')?.addEventListener('click', (e) => {
+    const btn = e.currentTarget;
+    const isCurrentlyOn = btn.classList.contains('active-toggle');
+    const nextState = !isCurrentlyOn;
+    btn.textContent = nextState ? '🕊️ Tự Nhắc Lịch Sự: BẬT' : '🕊️ Tự Nhắc Lịch Sự: TẮT';
+    btn.classList.toggle('active-toggle', nextState);
+    callRpc('church.gentleReminder', { toggleAuto: nextState });
+  });
+
+  document.getElementById('btnTriggerGentleReplyNow')?.addEventListener('click', () => {
+    audio.ensureContext();
+    callRpc('church.gentleReminder', { force: true });
   });
 
   document.getElementById('btnToggleTts')?.addEventListener('click', (e) => {

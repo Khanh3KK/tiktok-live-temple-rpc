@@ -157,6 +157,12 @@
             <button type="button" class="btn gold" id="btnToggleAutoGift" style="padding: 8px 14px; font-size: 13px;">
               ⚡ Tự động xướng Quà To / Combo x3+: ĐANG BẬT
             </button>
+            <button type="button" class="btn gold" id="btnToggleGentleReply" style="padding: 8px 14px; font-size: 13px;">
+              🕊️ Tự Nhắc Lịch Sự: BẬT
+            </button>
+            <button type="button" class="btn" id="btnTriggerGentleReplyNow" style="padding: 8px 14px; font-size: 13px;">
+              🔔 Phát Lời Nhắc Ngắn
+            </button>
             <button type="button" class="btn" id="btnFreezeGiftList" style="padding: 8px 14px; font-size: 13px;">
               🔒 Khóa bảng Quà: TẮT
             </button>
@@ -931,6 +937,29 @@
       });
     });
 
+    let autoGentleReplyEnabled = true;
+
+    document.getElementById('btnToggleGentleReply')?.addEventListener('click', async (e) => {
+      autoGentleReplyEnabled = !autoGentleReplyEnabled;
+      const btn = e.currentTarget;
+      btn.textContent = `🕊️ Tự Nhắc Lịch Sự: ${autoGentleReplyEnabled ? 'BẬT' : 'TẮT'}`;
+      btn.classList.toggle('gold', autoGentleReplyEnabled);
+      await sendRpc('church.gentleReminder', { toggleAuto: autoGentleReplyEnabled });
+    });
+
+    document.getElementById('btnTriggerGentleReplyNow')?.addEventListener('click', async () => {
+      updateStatusBadge('🕊️ Đang phát lời nhắc nhở lịch sự...', true);
+      const data = await sendRpc('church.gentleReminder', { force: true });
+      const url = data?.result?.url;
+      const player = document.getElementById('adminAudioPreview');
+      if (url && player) {
+        player.src = url;
+        player.volume = 0.95;
+        player.play().catch(() => {});
+      }
+      updateStatusBadge('✅ Đã phát lời nhắc nhở lịch sự', false);
+    });
+
     function connectAdminWebSocket() {
       const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const ws = new WebSocket(`${proto}//${window.location.host}/ws?workflow=church&role=admin`);
@@ -939,6 +968,8 @@
           const msg = JSON.parse(event.data);
           if (msg.method === 'church.event' && msg.params?.event) {
             ingestIncomingEvent(msg.params.event, false);
+          } else if (msg.method === 'church.gentleReminder' && msg.params?.text) {
+            updateStatusBadge(`🕊️ Đã tự động nhắc lịch sự: "${msg.params.text}"`, false);
           }
         } catch (_) {}
       };
@@ -952,6 +983,15 @@
         const st = await res.json();
         document.getElementById('statusBanner').textContent =
           `Nến đã thắp: ${st.totalCandles} | Tổng Ân Phúc: ${st.totalGrace} | Mân Côi: ${st.rosaryBeads} | ZeroTTS: ${st.tts?.status} (Giọng: ${st.tts?.voice})`;
+
+        if (st.settings && typeof st.settings.autoGentleReply === 'boolean') {
+          autoGentleReplyEnabled = st.settings.autoGentleReply;
+          const btnGentle = document.getElementById('btnToggleGentleReply');
+          if (btnGentle) {
+            btnGentle.textContent = `🕊️ Tự Nhắc Lịch Sự: ${autoGentleReplyEnabled ? 'BẬT' : 'TẮT'}`;
+            btnGentle.classList.toggle('gold', autoGentleReplyEnabled);
+          }
+        }
 
         if (Array.isArray(st.recentEvents)) {
           for (let i = st.recentEvents.length - 1; i >= 0; i--) {

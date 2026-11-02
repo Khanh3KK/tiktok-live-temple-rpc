@@ -791,7 +791,7 @@
         } else if (msg.method === 'temple.event') {
           if (msg.params?.state) updateUIState(msg.params.state);
           if (msg.params?.event) triggerRitualVisuals(msg.params.event);
-        } else if (msg.method === 'tts.play') {
+        } else if (msg.method === 'tts.play' || msg.method === 'temple.gentleReminder') {
           if (msg.params?.url) {
             audio.enqueueTts(msg.params.text || 'Nam mô A Di Đà Phật', {
               voice: msg.params.voice || 'maichi',

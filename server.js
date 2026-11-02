@@ -251,9 +251,15 @@ class ZeroTTSManager {
             volume: 1.0
           });
         }, 250);
-        // Pre-warm tuần tự trước các bước Nghi thức Hành Lễ 4 Phần & câu kinh Nhà Thờ để không làm nghẽn hàng đợi
+        // Pre-warm tuần tự trước các câu Nhắc Nhở Lịch Sự Ngắn Gọn, Nghi thức Hành Lễ 4 Phần & câu kinh Nhà Thờ để phát tức thì 0ms
         setTimeout(async () => {
           try {
+            for (const reminder of CHURCH_GENTLE_REMINDERS) {
+              await this.synthesize(reminder, 'kimoanh', 'prewarm').catch(() => {});
+            }
+            for (const reminder of TEMPLE_GENTLE_REMINDERS) {
+              await this.synthesize(reminder, 'maichi', 'prewarm').catch(() => {});
+            }
             if (MASS_LITURGY && Array.isArray(MASS_LITURGY.steps)) {
               for (const step of MASS_LITURGY.steps) {
                 if (step && step.text && !step.text.includes('{{RECENT_PARISHIONERS}}')) {
@@ -423,6 +429,7 @@ const DEFAULT_STATE = {
     ttsVolume: 0.35,
     sfxEnabled: true,
     smokeDensity: 1.0,
+    autoGentleReply: true,
     autoSim: false,
     autoSimIntervalMs: 9500
   },
@@ -1087,6 +1094,53 @@ const Rituals = {
 let tiktokConn = null;
 
 const commentCooldownMap = new Map();
+const GENTLE_REMINDER_COOLDOWN_MS = 90000;
+
+const TEMPLE_GENTLE_REMINDERS = [
+  'Đây là không gian nghe kinh thanh tịnh, xin quý vị cùng giữ lời nói hòa ái. A Di Đà Phật.'
+];
+
+const CHURCH_GENTLE_REMINDERS = [
+  'Đây là không gian chia sẻ Kinh Thánh và lan tỏa Lời Chúa, xin mọi người cùng giữ lời nói hiền hòa. Amen.',
+  'Xin anh chị em cùng giữ sự trang nghiêm để cộng đoàn lắng nghe Lời Chúa. Chúa chúc lành cho bạn.'
+];
+
+let lastTempleGentleReplyAt = 0;
+let templeGentleReplyCursor = 0;
+let lastChurchGentleReplyAt = 0;
+let churchGentleReplyCursor = 0;
+
+async function triggerTempleGentleReminder(force = false) {
+  if (!force) {
+    if (state.settings?.autoGentleReply === false) {
+      return { ok: false, triggered: false, reason: 'disabled' };
+    }
+    const now = Date.now();
+    if (now - lastTempleGentleReplyAt < GENTLE_REMINDER_COOLDOWN_MS) {
+      return { ok: false, triggered: false, reason: 'cooldown' };
+    }
+    lastTempleGentleReplyAt = now;
+  } else {
+    lastTempleGentleReplyAt = Date.now();
+  }
+  const text = TEMPLE_GENTLE_REMINDERS[templeGentleReplyCursor++ % TEMPLE_GENTLE_REMINDERS.length];
+  const res = await zeroTts.synthesize(text, 'maichi', 'high');
+  if (res.ok && res.url) {
+    broadcastNotification('temple.gentleReminder', {
+      text,
+      voice: 'maichi',
+      url: res.url
+    });
+  }
+  return {
+    ok: Boolean(res.ok),
+    triggered: Boolean(res.ok),
+    text,
+    voice: 'maichi',
+    url: res.url || '',
+    autoGentleReply: state.settings?.autoGentleReply !== false
+  };
+}
 
 function parseViewerComment(commentText, user, uniqueId, avatar) {
   const raw = String(commentText || '').trim();
@@ -1095,6 +1149,7 @@ function parseViewerComment(commentText, user, uniqueId, avatar) {
   }
   if (isBlockedSpamOrToxic(raw)) {
     console.log(`[Bộ Lọc Tịnh Tâm] Đã chặn bình luận không phù hợp từ ${user || uniqueId || 'ẩn danh'}: "${raw}"`);
+    triggerTempleGentleReminder(false).catch(() => {});
     return null;
   }
 
@@ -1599,6 +1654,7 @@ const DEFAULT_CHURCH_STATE = {
     massScheduleHours: [5, 6, 7, 12, 17, 18, 19, 20, 21, 22],
     bgMusicEnabled: true,
     sfxEnabled: true,
+    autoGentleReply: true,
     autoSim: false,
     autoSimIntervalMs: 9500
   },
@@ -2249,11 +2305,44 @@ const ChurchRituals = {
 
 const churchCommentCooldownMap = new Map();
 
+async function triggerChurchGentleReminder(force = false) {
+  if (!force) {
+    if (churchState.settings?.autoGentleReply === false) {
+      return { ok: false, triggered: false, reason: 'disabled' };
+    }
+    const now = Date.now();
+    if (now - lastChurchGentleReplyAt < GENTLE_REMINDER_COOLDOWN_MS) {
+      return { ok: false, triggered: false, reason: 'cooldown' };
+    }
+    lastChurchGentleReplyAt = now;
+  } else {
+    lastChurchGentleReplyAt = Date.now();
+  }
+  const text = CHURCH_GENTLE_REMINDERS[churchGentleReplyCursor++ % CHURCH_GENTLE_REMINDERS.length];
+  const res = await zeroTts.synthesize(text, 'kimoanh', 'high');
+  if (res.ok && res.url) {
+    broadcastNotification('church.gentleReminder', {
+      text,
+      voice: 'kimoanh',
+      url: res.url
+    });
+  }
+  return {
+    ok: Boolean(res.ok),
+    triggered: Boolean(res.ok),
+    text,
+    voice: 'kimoanh',
+    url: res.url || '',
+    autoGentleReply: churchState.settings?.autoGentleReply !== false
+  };
+}
+
 function parseChurchViewerComment(commentText, user, uniqueId, avatar) {
   const raw = String(commentText || '').trim();
   if (!raw) return null;
   if (isBlockedSpamOrToxic(raw)) {
     console.log(`[Bộ Lọc Tịnh Tâm] Đã chặn bình luận không phù hợp từ ${user || uniqueId || 'ẩn danh'}: "${raw}"`);
+    triggerChurchGentleReminder(false).catch(() => {});
     return null;
   }
 
@@ -2601,6 +2690,17 @@ async function handleRpcCall(method, params = {}) {
       return Rituals.resetMerit();
     case 'temple.comment':
       return parseViewerComment(params.comment, params.user, params.uniqueId, params.avatar);
+    case 'temple.gentleReminder': {
+      if (typeof params.toggleAuto === 'boolean') {
+        state.settings.autoGentleReply = params.toggleAuto;
+        saveState();
+        broadcastNotification('temple.state', getPublicState());
+        if (!params.force) {
+          return { ok: true, autoGentleReply: state.settings.autoGentleReply, state: getPublicState() };
+        }
+      }
+      return await triggerTempleGentleReminder(Boolean(params.force));
+    }
     case 'temple.speak':
     case 'temple.announceViewer': {
       const targetEvt = params.eventId
@@ -2664,6 +2764,17 @@ async function handleRpcCall(method, params = {}) {
       return ChurchRituals.resetGrace();
     case 'church.comment':
       return parseChurchViewerComment(params.comment, params.user, params.uniqueId, params.avatar);
+    case 'church.gentleReminder': {
+      if (typeof params.toggleAuto === 'boolean') {
+        churchState.settings.autoGentleReply = params.toggleAuto;
+        saveChurchState();
+        broadcastNotification('church.state', getChurchPublicState());
+        if (!params.force) {
+          return { ok: true, autoGentleReply: churchState.settings.autoGentleReply, state: getChurchPublicState() };
+        }
+      }
+      return await triggerChurchGentleReminder(Boolean(params.force));
+    }
     case 'church.speak':
     case 'church.announceViewer': {
       const targetEvt = params.eventId

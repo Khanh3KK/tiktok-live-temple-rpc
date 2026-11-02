@@ -1101,8 +1101,72 @@
     });
   }
 
+  const CLIENT_STANDALONE_TOKENS = [
+    'đm', 'dm', 'đmm', 'dmm', 'đkm', 'dkm', 'đcm', 'dcm', 'đcmm', 'dcmm', 'đklm',
+    'vcl', 'vl', 'vkl', 'vler', 'vll', 'vcc', 'vc', 'cc', 'cl', 'clm', 'cmm', 'cml',
+    'đéo', 'deo', 'đếch', 'đệch', 'đệt', 'đjt', 'djt', 'dit', 'đit', 'địt',
+    'lồn', 'lon', 'loz', 'lờ', 'cặc', 'cac', 'cak', 'cẹc', 'buồi', 'buoi',
+    'dái', 'cứt', 'cut', 'đái', 'đĩ', 'điếm', 'phò', 'cave', 'chịch', 'xoạc',
+    'nứng', 'dâm', 'sục', 'đụ', 'đù', 'đụmá', 'đụmẹ', 'đmá', 'đmẹ', 'mịa',
+    'clgt', 'wtf', 'wth', 'lol', 'lmao', 'ngu', 'đần', 'cút', 'bịp', 'sex', 'porn', 'jav',
+    'haha', 'hehe', 'hihi', 'ohehe', 'hoho', 'kaka', 'sặc'
+  ];
+  const CLIENT_SPACED_PHRASES = [
+    'bóp dái', 'đá dái', 'vãi l', 'vãi c', 'vãi đ', 'vãi chưởng', 'cái lồn', 'con cặc',
+    'đầu buồi', 'ăn cứt', 'chi cứt', 'cục cứt', 'con đĩ', 'con phò', 'thằng chó', 'con chó',
+    'chó đẻ', 'óc chó', 'óc lợn', 'súc vật', 'khốn nạn', 'mẹ kiếp', 'mẹ mày', 'má mày',
+    'bố mày', 'cha mày', 'chết tiệt', 'chết mẹ', 'hiếp dâm', 'ấu dâm', 'khiêu dâm',
+    'i cư', 'kimochi', 'yamate', 'yamete', 'tài xỉu', 'cá độ', 'nổ hũ', 'nhà cái',
+    'lừa đảo', 'lừa à', 'telegram', 'bố là trùm', 'hết trò', 'làm trò', 'trò hề',
+    'câu view', 'câu like', 'nhảm nhí', 'xàm xí', 'tào lao', 'vớ vẩn', 'rảnh háng',
+    'báng bổ', 'phỉ báng', 'dị giáo', 'tà đạo', 'giả tạo', 'diễn sâu', 'như thật',
+    'chịu đấy', 'chịu luôn', 'vụ này luôn', 'hết chùa', 'sang nhà thờ', 'chúa giả',
+    'phật giả', 'tẩy chay', 'rác rưởi', 'ủa alo', 'ủa rồi', 'lạy luôn'
+  ];
+  const CLIENT_COMPACT_SUBS = [
+    'bópdái', 'bopdai', 'đádái', 'dadai', 'đầubuồi', 'daubuoi', 'cáilồn', 'concặc',
+    'ăncứt', 'chicứt', 'cụccứt', 'conđĩ', 'conphò', 'chóđẻ', 'ócchó', 'súcvật',
+    'khốnnạn', 'mẹkiếp', 'mẹmày', 'bốmày', 'chếttiệt', 'chếtmẹ', 'hiếpdâm', 'ấudâm',
+    'xnxx', 'xvideos', 'pornhub', 'yamate', 'yamete', 'kimochi', 'tàixỉu', 'nổhũ',
+    'kubet', 'sunwin', 'go88', 'lừađảo', 'telegram', 'bốlàtrùm', 'đụmá', 'đụmẹ',
+    'địtmẹ', 'vãilồn', 'vãicặc', 'hếttrò', 'nhưthật', 'chịuđấy', 'hếtchùa',
+    'sangnhàthờ', 'ohehe'
+  ];
+  const CLIENT_MOCK_EMOJI_RE = /[🤣😂😆😜🤪🤡💩🖕🤮🤢]/u;
+
+  function isClientToxicText(rawText) {
+    if (!rawText) return true;
+    const s = String(rawText).trim();
+    if (!s || s.startsWith('@') || CLIENT_MOCK_EMOJI_RE.test(s) || /\?\s*\?+/.test(s)) return true;
+    const lower = s.normalize('NFKC').normalize('NFC').toLowerCase();
+    const words = lower.replace(/[^0-9a-zA-ZÀ-ỹĂăĐđĨĩŨũƠơƯư]+/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!words) return true;
+    const spaced = ` ${words} `;
+    const compact = words.replace(/\s+/g, '');
+    const collapsedSpaced = ` ${words.replace(/(.)\1{2,}/g, '$1')} `;
+    const collapsedCompact = compact.replace(/(.)\1{2,}/g, '$1');
+    for (const tk of CLIENT_STANDALONE_TOKENS) {
+      const needle = ` ${tk} `;
+      if (spaced.includes(needle) || collapsedSpaced.includes(needle)) return true;
+    }
+    for (const p of CLIENT_SPACED_PHRASES) {
+      const needle = ` ${p} `;
+      if (spaced.includes(needle) || collapsedSpaced.includes(needle)) return true;
+    }
+    for (const sub of CLIENT_COMPACT_SUBS) {
+      if (compact.includes(sub) || collapsedCompact.includes(sub)) return true;
+    }
+    return false;
+  }
+
+  function sanitizeClientUser(name) {
+    const s = String(name || '').trim();
+    if (!s || isClientToxicText(s)) return 'Thí Chủ Hữu Duyên';
+    return s;
+  }
+
   function shortenName(name, maxLen = 13) {
-    const str = String(name || '');
+    const str = sanitizeClientUser(name);
     return str.length > maxLen ? str.slice(0, maxLen - 1) + '…' : str;
   }
 

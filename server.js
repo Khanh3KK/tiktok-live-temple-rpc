@@ -497,24 +497,175 @@ function getLeaderboard(limit = 6) {
       lastWish: d.lastWish || ''
     }));
 }
-// Bộ lọc chặn ký tự lạ (Cuneiform 𒐫, Zalgo, Braille, ký tự spam) & từ ngữ phản cảm
+// ============================================================================
+// BỘ LỌC NGÔN TỪ TRANG NGHIÊM ĐA TẦNG (MULTI-LAYER SACRED SANCTUARY MODERATION)
+// ============================================================================
 const WEIRD_SPAM_RE = /[\u{12000}-\u{1254F}\uFDFD\u2800-\u28FF\u2580-\u259F]|[\u0300-\u036F]{3,}/u;
 const BRACKET_EMOTE_RE = /\[[^\]]{1,24}\]/g;
 const ALLOWED_VI_TEXT_RE = /[^0-9a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠ-ỹ\s.,!?]/g;
 const ALLOWED_VI_NAME_RE = /[^0-9a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠ-ỹ\s._-]/g;
 const VI_LETTER_RE = /[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠ-ỹ]/g;
-const BAD_WORDS_RE = /(đá dái|địt|lồn|cặc|đm|vcl|vl|yamate|i cư|lừa đảo|lừa à|te-le gram|telegram|bố là trùm)/i;
+const MODERATION_NON_WORD_RE = /[^0-9a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠ-ỹ]+/g;
+
+// Nhóm A: Từ viết tắt tục tĩu / tiếng lóng đứng độc lập (kiểm tra theo ranh giới từ trên spaced & collapsedSpaced)
+const STANDALONE_PROFANE_TOKENS = [
+  'đm', 'dm', 'đmm', 'dmm', 'đkm', 'dkm', 'đcm', 'dcm', 'đcmm', 'dcmm', 'đklm',
+  'vcl', 'vl', 'vkl', 'vler', 'vll', 'vcc', 'vc', 'cc', 'cl', 'clm', 'cmm', 'cml',
+  'đéo', 'deo', 'đếch', 'đệch', 'đệt', 'đjt', 'djt', 'dit', 'đit', 'địt',
+  'lồn', 'lon', 'loz', 'lờ', 'cặc', 'cac', 'cak', 'cẹc', 'buồi', 'buoi',
+  'dái', 'cứt', 'cut', 'đái', 'đĩ', 'điếm', 'phò', 'cave', 'chịch', 'xoạc',
+  'nứng', 'dâm', 'sục', 'đụ', 'đù', 'đụmá', 'đụmẹ', 'đmá', 'đmẹ', 'mịa',
+  'clgt', 'wtf', 'wth', 'lol', 'lmao', 'ngu', 'đần', 'cút', 'bịp', 'sex', 'porn', 'jav'
+];
+
+// Nhóm B1: Cụm từ nhạy cảm, tục tĩu, bạo lực, cờ bạc, lừa đảo (kiểm tra trên spaced & collapsedSpaced)
+const PROFANE_SPACED_PHRASES = [
+  'bóp dái', 'đá dái', 'vãi l', 'vãi c', 'vãi đ', 'vãi chưởng', 'vãi cả',
+  'cái lồn', 'con cặc', 'đầu buồi', 'đầu bùi', 'ăn cứt', 'chi cứt', 'cục cứt',
+  'con đĩ', 'con phò', 'thằng chó', 'con chó', 'chó đẻ', 'óc chó', 'óc lợn',
+  'súc vật', 'khốn nạn', 'mẹ kiếp', 'mẹ mày', 'má mày', 'bố mày', 'cha mày',
+  'ông nội mày', 'bà nội mày', 'cả lò', 'tổ sư', 'tiên sư', 'mả cha', 'mả mẹ',
+  'chết tiệt', 'chết bầm', 'chết mẹ', 'chết cha', 'tự tử', 'nhảy cầu', 'máu me',
+  'hiếp dâm', 'ấu dâm', 'loạn luân', 'khiêu dâm', 'i cư', 'kimochi', 'yamate', 'yamete',
+  'cờ bạc', 'tài xỉu', 'cá độ', 'nổ hũ', 'nhà cái', 'lừa đảo', 'lừa à',
+  'te le gram', 'telegram', 'zalo', 'bố là trùm'
+];
+
+// Nhóm B2: Chuỗi viết liền không dấu cách (kiểm tra trên compact & collapsedCompact, bắt chuẩn "thòtay sangtrái bópdái bạntrai")
+const PROFANE_COMPACT_SUBSTRINGS = [
+  'bópdái', 'bopdai', 'đádái', 'dadai', 'đầubuồi', 'daubuoi', 'đầubùi',
+  'cáilồn', 'cailon', 'concặc', 'concac', 'ăncứt', 'ancut', 'chicứt', 'cụccứt',
+  'conđĩ', 'conphò', 'chóđẻ', 'ócchó', 'óclợn', 'súcvật', 'khốnnạn',
+  'mẹkiếp', 'mẹmày', 'mámày', 'bốmày', 'chamày', 'mảcha', 'mảmẹ',
+  'chếttiệt', 'chếtbầm', 'chếtmẹ', 'chếtcha', 'hiếpdâm', 'ấudâm', 'loạnluân', 'khiêudâm',
+  'xnxx', 'xvideos', 'pornhub', 'yamate', 'yamete', 'kimochi',
+  'tàixỉu', 'nổhũ', 'nhàcái', 'kubet', 'sunwin', 'go88',
+  'lừađảo', 'telegram', 'bốlàtrùm', 'đụmá', 'đụmẹ', 'địtconmẹ', 'địtmẹ', 'ditme',
+  'vãilồn', 'vãicặc', 'vãichưởng'
+];
+
+// Nhóm C: Bình luận thiếu tôn trọng, giễu cợt, mỉa mai, chế nhạo tôn giáo hoặc tiêu cực
+const DISRESPECTFUL_SPACED_PHRASES = [
+  'hết trò', 'làm trò', 'trò hề', 'câu view', 'câu like', 'câu tương tác',
+  'kiếm tiền', 'ăn xin online', 'ăn mày online', 'nhảm nhí', 'nhảm quá',
+  'xàm xí', 'xàm quá', 'xàm l', 'tào lao', 'vớ vẩn', 'rảnh háng', 'rảnh đời', 'rảnh quá',
+  'báng bổ', 'phỉ báng', 'dị giáo', 'tà đạo', 'mê tín', 'dị đoan',
+  'giả tạo', 'diễn sâu', 'như thật', 'chịu đấy', 'chịu luôn', 'vụ này luôn', 'vụ mới',
+  'hết chùa', 'sang nhà thờ', 'chúa giả', 'phật giả', 'ai đọc', 'giọng ai',
+  'tẩy chay', 'báo cáo', 'report', 'kinh tởm', 'rác rưởi', 'bẩn thỉu',
+  'xuống địa ngục', 'quỷ tha ma bắt', 'ma quỷ', 'quỷ sứ', 'xui xẻo', 'tai họa', 'trù ẻo',
+  'chán đời', 'tuyệt vọng', 'muốn chết', 'hận thù', 'oán hận',
+  'ủa alo', 'ủa rồi', 'hố hố', 'lạy luôn'
+];
+
+const DISRESPECTFUL_COMPACT_SUBSTRINGS = [
+  'hếttrò', 'làmtrò', 'tròhề', 'câuview', 'câulike', 'ănxinonline', 'ănmàyonline',
+  'nhảmnhí', 'xàmxí', 'tàolao', 'vớvẩn', 'rảnhháng', 'bángbổ', 'phỉbáng',
+  'dịgiáo', 'tàđạo', 'mêtín', 'dịđoan', 'giảtạo', 'diễnsâu', 'nhưthật',
+  'chịuđấy', 'chịuluôn', 'vụnàyluôn', 'hếtchùa', 'sangnhàthờ', 'chúagiả', 'phậtgiả',
+  'tẩychay', 'kinhtởm', 'rácrưởi', 'bẩnthỉu', 'xuốngđịangục', 'quỷthama',
+  'trùẻo', 'oánhận', 'ủarồi', 'ủaalo', 'ohehe'
+];
+
+const MOCKING_LAUGH_TOKENS = [
+  'haha', 'hahaha', 'hehe', 'hehehe', 'hihi', 'hihihi', 'ohehe', 'hoho', 'kaka', 'kakaka', 'sặc'
+];
+
+const MOCKING_EMOJI_RE = /[🤣😂😆😜🤪🤡💩🖕🤮🤢]/u;
+const SARCASTIC_QUESTION_RE = /\?\s*\?+/;
+
+function normalizeForModeration(str) {
+  const raw = String(str || '');
+  const lower = raw.normalize('NFKC').normalize('NFC').toLowerCase();
+  const words = lower.replace(MODERATION_NON_WORD_RE, ' ').replace(/\s+/g, ' ').trim();
+  const spaced = words ? ` ${words} ` : '';
+  const compact = words.replace(/\s+/g, '');
+  const collapsedWords = words.replace(/(.)\1{2,}/g, '$1');
+  const collapsedSpaced = collapsedWords ? ` ${collapsedWords} ` : '';
+  const collapsedCompact = compact.replace(/(.)\1{2,}/g, '$1');
+  return { raw, lower, spaced, compact, collapsedSpaced, collapsedCompact };
+}
+
+function hasStandaloneToken(norm, tokenList) {
+  if (!norm.spaced) return false;
+  for (const tk of tokenList) {
+    const needle = ` ${tk} `;
+    if (norm.spaced.includes(needle) || norm.collapsedSpaced.includes(needle)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function hasSpacedPhrase(norm, phraseList) {
+  if (!norm.spaced) return false;
+  for (const p of phraseList) {
+    const needle = ` ${p} `;
+    if (norm.spaced.includes(needle) || norm.collapsedSpaced.includes(needle)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function hasCompactSubstring(norm, subList) {
+  if (!norm.compact) return false;
+  for (const sub of subList) {
+    if (norm.compact.includes(sub) || norm.collapsedCompact.includes(sub)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isBlockedName(rawName) {
+  if (!rawName) return true;
+  const s = String(rawName).trim();
+  if (!s || WEIRD_SPAM_RE.test(s) || MOCKING_EMOJI_RE.test(s)) return true;
+  const norm = normalizeForModeration(s);
+  if (!norm.compact) return true;
+  if (hasStandaloneToken(norm, STANDALONE_PROFANE_TOKENS)) return true;
+  if (hasSpacedPhrase(norm, PROFANE_SPACED_PHRASES)) return true;
+  if (hasCompactSubstring(norm, PROFANE_COMPACT_SUBSTRINGS)) return true;
+  if (hasSpacedPhrase(norm, DISRESPECTFUL_SPACED_PHRASES)) return true;
+  if (hasCompactSubstring(norm, DISRESPECTFUL_COMPACT_SUBSTRINGS)) return true;
+  return false;
+}
+
+function isNegativeOrDisrespectful(raw) {
+  if (!raw) return false;
+  const s = String(raw).trim();
+  if (!s) return false;
+  if (s.startsWith('@')) return true;
+  if (MOCKING_EMOJI_RE.test(s)) return true;
+  if (SARCASTIC_QUESTION_RE.test(s)) return true;
+  const norm = normalizeForModeration(s);
+  if (hasStandaloneToken(norm, MOCKING_LAUGH_TOKENS)) return true;
+  if (hasSpacedPhrase(norm, DISRESPECTFUL_SPACED_PHRASES)) return true;
+  if (hasCompactSubstring(norm, DISRESPECTFUL_COMPACT_SUBSTRINGS)) return true;
+  return false;
+}
 
 function isBlockedSpamOrToxic(raw) {
   if (!raw) return true;
-  const s = String(raw);
+  const s = String(raw).trim();
+  if (!s) return true;
   if (WEIRD_SPAM_RE.test(s)) return true;
-  if (BAD_WORDS_RE.test(s)) return true;
+  if (isNegativeOrDisrespectful(s)) return true;
+  const norm = normalizeForModeration(s);
+  if (!norm.compact) return true;
+  if (hasStandaloneToken(norm, STANDALONE_PROFANE_TOKENS)) return true;
+  if (hasSpacedPhrase(norm, PROFANE_SPACED_PHRASES)) return true;
+  if (hasCompactSubstring(norm, PROFANE_COMPACT_SUBSTRINGS)) return true;
   return false;
 }
 
 function sanitizeUserName(rawName) {
-  const normalized = String(rawName || '')
+  const s = String(rawName || '').trim();
+  if (!s || isBlockedName(s)) {
+    return 'Thí Chủ Hữu Duyên';
+  }
+  const normalized = s
     .normalize('NFKC')
     .normalize('NFC')
     .replace(BRACKET_EMOTE_RE, ' ')
@@ -524,7 +675,7 @@ function sanitizeUserName(rawName) {
     .trim()
     .slice(0, 26);
 
-  if (!normalized || BAD_WORDS_RE.test(normalized)) {
+  if (!normalized || isBlockedName(normalized)) {
     return 'Thí Chủ Hữu Duyên';
   }
   const letters = normalized.match(VI_LETTER_RE) || [];
@@ -536,7 +687,9 @@ function sanitizeUserName(rawName) {
 
 function sanitizeWishText(rawWish) {
   if (!rawWish) return '';
-  const cleaned = String(rawWish)
+  const rawStr = String(rawWish).trim();
+  if (!rawStr || isBlockedSpamOrToxic(rawStr)) return '';
+  const cleaned = rawStr
     .normalize('NFKC')
     .normalize('NFC')
     .replace(BRACKET_EMOTE_RE, ' ')
@@ -547,7 +700,7 @@ function sanitizeWishText(rawWish) {
     .replace(/^[.,!?\s-]+|[.,!?\s-]+$/g, '')
     .slice(0, 220);
 
-  if (!cleaned || BAD_WORDS_RE.test(cleaned)) return '';
+  if (!cleaned || isBlockedSpamOrToxic(cleaned)) return '';
   const letters = cleaned.match(VI_LETTER_RE) || [];
   if (letters.length < 2) return '';
   return cleaned;
@@ -556,11 +709,12 @@ function sanitizeWishText(rawWish) {
 function recordDevotee(user, uniqueId, avatar, meritDelta, incenseDelta = 0, giftDelta = 0, wish = '') {
   const displayName = sanitizeUserName(user || uniqueId);
   const cleanWish = sanitizeWishText(wish);
-  const key = (uniqueId || displayName).slice(0, 40);
+  const safeUniqueId = isBlockedName(uniqueId) ? '' : String(uniqueId || '').trim();
+  const key = (safeUniqueId || displayName).slice(0, 40);
   if (!state.devotees[key]) {
     state.devotees[key] = {
       name: displayName,
-      uniqueId: uniqueId || displayName.toLowerCase().replace(/\s+/g, ''),
+      uniqueId: safeUniqueId || displayName.toLowerCase().replace(/\s+/g, ''),
       avatar: avatar || '',
       merit: 0,
       incense: 0,
@@ -936,7 +1090,11 @@ const commentCooldownMap = new Map();
 
 function parseViewerComment(commentText, user, uniqueId, avatar) {
   const raw = String(commentText || '').trim();
-  if (!raw || isBlockedSpamOrToxic(raw)) {
+  if (!raw) {
+    return null;
+  }
+  if (isBlockedSpamOrToxic(raw)) {
+    console.log(`[Bộ Lọc Tịnh Tâm] Đã chặn bình luận không phù hợp từ ${user || uniqueId || 'ẩn danh'}: "${raw}"`);
     return null;
   }
 
@@ -1502,18 +1660,76 @@ function saveChurchState() {
 
 function sanitizeParishionerName(rawName) {
   const cleaned = sanitizeUserName(rawName);
-  return cleaned === 'Thí Chủ Hữu Duyên' ? 'Tín Hữu Ánh Sáng' : cleaned;
+  return cleaned === 'Thí Chủ Hữu Duyên' ? 'Tín Hữu Tâm Thành' : cleaned;
 }
+
+function scrubPersistedStates() {
+  let templeModified = false;
+  if (state.devotees && typeof state.devotees === 'object') {
+    for (const [k, dev] of Object.entries(state.devotees)) {
+      if (!dev) continue;
+      const cleanName = sanitizeUserName(dev.name || k);
+      if (dev.name !== cleanName) {
+        dev.name = cleanName;
+        templeModified = true;
+      }
+      if (dev.lastWish && isBlockedSpamOrToxic(dev.lastWish)) {
+        dev.lastWish = 'Nam Mô A Di Đà Phật, cầu bình an cát tường';
+        templeModified = true;
+      }
+    }
+  }
+  if (Array.isArray(state.recentEvents)) {
+    const beforeLen = state.recentEvents.length;
+    state.recentEvents = state.recentEvents.filter((ev) => {
+      if (!ev) return false;
+      if (ev.wish && isBlockedSpamOrToxic(ev.wish)) return false;
+      ev.user = sanitizeUserName(ev.user);
+      return true;
+    });
+    if (state.recentEvents.length !== beforeLen) templeModified = true;
+  }
+  if (templeModified) saveState();
+
+  let churchModified = false;
+  if (churchState.parishioners && typeof churchState.parishioners === 'object') {
+    for (const [k, p] of Object.entries(churchState.parishioners)) {
+      if (!p) continue;
+      const cleanName = sanitizeParishionerName(p.name || k);
+      if (p.name !== cleanName) {
+        p.name = cleanName;
+        churchModified = true;
+      }
+      if (p.lastWish && isBlockedSpamOrToxic(p.lastWish)) {
+        p.lastWish = 'Đã vào Thánh Đường hiệp thông';
+        churchModified = true;
+      }
+    }
+  }
+  if (Array.isArray(churchState.recentEvents)) {
+    const beforeLen = churchState.recentEvents.length;
+    churchState.recentEvents = churchState.recentEvents.filter((ev) => {
+      if (!ev) return false;
+      if (ev.wish && isBlockedSpamOrToxic(ev.wish)) return false;
+      ev.user = sanitizeParishionerName(ev.user);
+      return true;
+    });
+    if (churchState.recentEvents.length !== beforeLen) churchModified = true;
+  }
+  if (churchModified) saveChurchState();
+}
+scrubPersistedStates();
 
 function recordParishioner(user, uniqueId, avatar, graceDelta, candleDelta = 0, giftDelta = 0, wish = '', gender = null) {
   const displayName = sanitizeParishionerName(user || uniqueId);
   const cleanWish = sanitizeWishText(wish);
   const resolvedGender = gender || detectViewerGender(displayName, uniqueId);
-  const key = (uniqueId || displayName).slice(0, 40);
+  const safeUniqueId = isBlockedName(uniqueId) ? '' : String(uniqueId || '').trim();
+  const key = (safeUniqueId || displayName).slice(0, 40);
   if (!churchState.parishioners[key]) {
     churchState.parishioners[key] = {
       name: displayName,
-      uniqueId: uniqueId || displayName.toLowerCase().replace(/\s+/g, ''),
+      uniqueId: safeUniqueId || displayName.toLowerCase().replace(/\s+/g, ''),
       avatar: avatar || '',
       gender: resolvedGender,
       grace: 0,
@@ -2035,7 +2251,11 @@ const churchCommentCooldownMap = new Map();
 
 function parseChurchViewerComment(commentText, user, uniqueId, avatar) {
   const raw = String(commentText || '').trim();
-  if (!raw || isBlockedSpamOrToxic(raw)) return null;
+  if (!raw) return null;
+  if (isBlockedSpamOrToxic(raw)) {
+    console.log(`[Bộ Lọc Tịnh Tâm] Đã chặn bình luận không phù hợp từ ${user || uniqueId || 'ẩn danh'}: "${raw}"`);
+    return null;
+  }
 
   const cleanWish = sanitizeWishText(raw);
   if (!cleanWish || cleanWish.length < 3) return null;
@@ -2388,11 +2608,12 @@ async function handleRpcCall(method, params = {}) {
         : null;
       const user = sanitizeUserName(params.user || targetEvt?.user || 'Thí Chủ');
       const wish = sanitizeWishText(params.wish || targetEvt?.wish || 'Cầu gia đạo bình an');
+      const customText = params.text && !isBlockedSpamOrToxic(params.text) ? String(params.text).trim() : '';
       const speechText =
-        params.text ||
+        customText ||
         params.suggestedTts ||
         targetEvt?.suggestedTts ||
-        `Cảm tạ thí chủ ${user} thành tâm cầu nguyện: ${wish}. Nam mô A Di Đà Phật.`;
+        `Cảm tạ thí chủ ${user} thành tâm cầu nguyện: ${wish || 'Cầu gia đạo bình an'}. Nam mô A Di Đà Phật.`;
       const res = await zeroTts.synthesize(speechText, params.voice || 'maichi', 'high');
       if (res.ok && params.broadcast !== false) {
         broadcastNotification('tts.play', {
@@ -2462,7 +2683,7 @@ async function handleRpcCall(method, params = {}) {
         shortWish = lastSpace > 100 ? cut.slice(0, lastSpace) : cut;
       }
 
-      let speechText = params.text || '';
+      let speechText = params.text && !isBlockedSpamOrToxic(params.text) ? String(params.text).trim() : '';
       if (!speechText) {
         if (targetEvt?.type === 'offerGift' || targetEvt?.type === 'grandBlessing') {
           speechText = `Cảm tạ ân nhân ${user} đã tiến dâng ${targetEvt.giftName || 'lễ vật'}. Amen.`;
@@ -2572,6 +2793,9 @@ app.all('/api/tts', async (req, res) => {
   const priority = (req.body?.priority || req.query?.priority || '').trim();
   if (!text) {
     return res.status(400).json({ ok: false, error: 'Thiếu nội dung text cần đọc' });
+  }
+  if (isBlockedSpamOrToxic(text)) {
+    return res.status(400).json({ ok: false, error: 'Filtered toxic/inappropriate text' });
   }
   const result = await zeroTts.synthesize(text, voice, priority);
   res.json(result);

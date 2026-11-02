@@ -389,11 +389,77 @@
       }
     }
 
+    // Bộ lọc Ngôn Từ Trang Nghiêm phía Admin Dashboard (chặn từ tục, viết tắt thô, tên ghép bậy & bình luận cợt nhả)
+    const ADMIN_STANDALONE_TOKENS = [
+      'đm', 'dm', 'đmm', 'dmm', 'đkm', 'dkm', 'đcm', 'dcm', 'đcmm', 'dcmm', 'đklm',
+      'vcl', 'vl', 'vkl', 'vler', 'vll', 'vcc', 'vc', 'cc', 'cl', 'clm', 'cmm', 'cml',
+      'đéo', 'deo', 'đếch', 'đệch', 'đệt', 'đjt', 'djt', 'dit', 'đit', 'địt',
+      'lồn', 'lon', 'loz', 'lờ', 'cặc', 'cac', 'cak', 'cẹc', 'buồi', 'buoi',
+      'dái', 'cứt', 'cut', 'đái', 'đĩ', 'điếm', 'phò', 'cave', 'chịch', 'xoạc',
+      'nứng', 'dâm', 'sục', 'đụ', 'đù', 'đụmá', 'đụmẹ', 'đmá', 'đmẹ', 'mịa',
+      'clgt', 'wtf', 'wth', 'lol', 'lmao', 'ngu', 'đần', 'cút', 'bịp', 'sex', 'porn', 'jav',
+      'haha', 'hehe', 'hihi', 'ohehe', 'hoho', 'kaka', 'sặc'
+    ];
+    const ADMIN_SPACED_PHRASES = [
+      'bóp dái', 'đá dái', 'vãi l', 'vãi c', 'vãi đ', 'vãi chưởng', 'cái lồn', 'con cặc',
+      'đầu buồi', 'ăn cứt', 'chi cứt', 'cục cứt', 'con đĩ', 'con phò', 'thằng chó', 'con chó',
+      'chó đẻ', 'óc chó', 'óc lợn', 'súc vật', 'khốn nạn', 'mẹ kiếp', 'mẹ mày', 'má mày',
+      'bố mày', 'cha mày', 'chết tiệt', 'chết mẹ', 'hiếp dâm', 'ấu dâm', 'khiêu dâm',
+      'i cư', 'kimochi', 'yamate', 'yamete', 'tài xỉu', 'cá độ', 'nổ hũ', 'nhà cái',
+      'lừa đảo', 'lừa à', 'telegram', 'bố là trùm', 'hết trò', 'làm trò', 'trò hề',
+      'câu view', 'câu like', 'nhảm nhí', 'xàm xí', 'tào lao', 'vớ vẩn', 'rảnh háng',
+      'báng bổ', 'phỉ báng', 'dị giáo', 'tà đạo', 'giả tạo', 'diễn sâu', 'như thật',
+      'chịu đấy', 'chịu luôn', 'vụ này luôn', 'hết chùa', 'sang nhà thờ', 'chúa giả',
+      'phật giả', 'tẩy chay', 'rác rưởi', 'ủa alo', 'ủa rồi', 'lạy luôn'
+    ];
+    const ADMIN_COMPACT_SUBS = [
+      'bópdái', 'bopdai', 'đádái', 'dadai', 'đầubuồi', 'daubuoi', 'cáilồn', 'concặc',
+      'ăncứt', 'chicứt', 'cụccứt', 'conđĩ', 'conphò', 'chóđẻ', 'ócchó', 'súcvật',
+      'khốnnạn', 'mẹkiếp', 'mẹmày', 'bốmày', 'chếttiệt', 'chếtmẹ', 'hiếpdâm', 'ấudâm',
+      'xnxx', 'xvideos', 'pornhub', 'yamate', 'yamete', 'kimochi', 'tàixỉu', 'nổhũ',
+      'kubet', 'sunwin', 'go88', 'lừađảo', 'telegram', 'bốlàtrùm', 'đụmá', 'đụmẹ',
+      'địtmẹ', 'vãilồn', 'vãicặc', 'hếttrò', 'nhưthật', 'chịuđấy', 'hếtchùa',
+      'sangnhàthờ', 'ohehe'
+    ];
+    const ADMIN_MOCK_EMOJI_RE = /[🤣😂😆😜🤪🤡💩🖕🤮🤢]/u;
+
+    function isToxicOrDisrespectful(rawText) {
+      if (!rawText) return true;
+      const s = String(rawText).trim();
+      if (!s || s.startsWith('@') || ADMIN_MOCK_EMOJI_RE.test(s) || /\?\s*\?+/.test(s)) return true;
+      const lower = s.normalize('NFKC').normalize('NFC').toLowerCase();
+      const words = lower.replace(/[^0-9a-zA-ZÀ-ỹĂăĐđĨĩŨũƠơƯư]+/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!words) return true;
+      const spaced = ` ${words} `;
+      const compact = words.replace(/\s+/g, '');
+      const collapsedSpaced = ` ${words.replace(/(.)\1{2,}/g, '$1')} `;
+      const collapsedCompact = compact.replace(/(.)\1{2,}/g, '$1');
+      for (const tk of ADMIN_STANDALONE_TOKENS) {
+        const needle = ` ${tk} `;
+        if (spaced.includes(needle) || collapsedSpaced.includes(needle)) return true;
+      }
+      for (const p of ADMIN_SPACED_PHRASES) {
+        const needle = ` ${p} `;
+        if (spaced.includes(needle) || collapsedSpaced.includes(needle)) return true;
+      }
+      for (const sub of ADMIN_COMPACT_SUBS) {
+        if (compact.includes(sub) || collapsedCompact.includes(sub)) return true;
+      }
+      return false;
+    }
+
+    function sanitizeAdminUserName(rawUser) {
+      const s = String(rawUser || '').trim();
+      if (!s || isToxicOrDisrespectful(s)) return 'Tín Hữu Tâm Thành';
+      return s.slice(0, 32);
+    }
+
     try {
       const savedGifts = JSON.parse(sessionStorage.getItem(GIFT_STORAGE_KEY) || '[]');
       if (Array.isArray(savedGifts)) {
         giftEvents = savedGifts
           .filter((g) => g && g.id && !String(g.id).startsWith('lb_donor_'))
+          .map((g) => ({ ...g, user: sanitizeAdminUserName(g.user) }))
           .slice(0, 60);
         giftEvents.forEach((g) => seenEventIds.add(g.id));
       }
@@ -421,12 +487,13 @@
 
     // Làm gọn tên người xem (bỏ chuỗi số dài phía sau như 1990, 2003 để đọc tự nhiên và nhanh hơn)
     function cleanSpokenViewerName(rawUser) {
-      let name = String(rawUser || 'Tín Hữu')
+      const safeUser = sanitizeAdminUserName(rawUser);
+      let name = String(safeUser || 'Tín Hữu Tâm Thành')
         .replace(/[0-9]{3,}/g, '')
         .replace(/[_.\-~!@#$%^&*()+=]+/g, ' ')
         .replace(/\s+/g, ' ')
         .trim();
-      if (name.length < 2) name = String(rawUser || 'Tín Hữu').trim();
+      if (name.length < 2) name = 'Tín Hữu Tâm Thành';
       return name.slice(0, 38);
     }
 
@@ -692,7 +759,12 @@
       if (seenEventIds.has(ev.id)) return;
       seenEventIds.add(ev.id);
 
+      ev.user = sanitizeAdminUserName(ev.user);
+
       const isGift = ev.type === 'offerGift' || ev.type === 'grandBlessing';
+      if (!isGift && ev.wish && isToxicOrDisrespectful(ev.wish)) {
+        return;
+      }
       if (isGift) {
         // GỘP CHUNG QUÀ CỦA CÙNG 1 KHÁN GIẢ VÀO 1 DÒNG DUY NHẤT để danh sách không bị nhảy khi 1 người thả liên tiếp 5-10 bông hoa!
         const userKey = String(ev.user || '').trim().toLowerCase();

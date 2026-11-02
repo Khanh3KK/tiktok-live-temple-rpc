@@ -58,10 +58,83 @@ LOCAL_MODEL_CANDIDATES = [
 VIETNAMESE_ALLOWED_RE = re.compile(
     r"[^0-9a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠ-ỹ\s.,!?]"
 )
+MODERATION_NON_WORD_RE = re.compile(
+    r"[^0-9a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠ-ỹ]+"
+)
 BRACKET_EMOTE_RE = re.compile(r"\[[^\]]{1,24}\]")
 REPEATED_CHARS_RE = re.compile(r"(.)\1{2,}", re.IGNORECASE)
 MULTI_PUNCT_RE = re.compile(r"([.,!?])\1+")
 MULTI_SPACE_RE = re.compile(r"\s+")
+MOCKING_EMOJI_RE = re.compile(r"[🤣😂😆😜🤪🤡💩🖕🤮🤢]")
+SARCASTIC_QUESTION_RE = re.compile(r"\?\s*\?+")
+
+STANDALONE_PROFANE_TOKENS = {
+    "đm", "dm", "đmm", "dmm", "đkm", "dkm", "đcm", "dcm", "đcmm", "dcmm", "đklm",
+    "vcl", "vl", "vkl", "vler", "vll", "vcc", "vc", "cc", "cl", "clm", "cmm", "cml",
+    "đéo", "deo", "đếch", "đệch", "đệt", "đjt", "djt", "dit", "đit", "địt",
+    "lồn", "lon", "loz", "lờ", "cặc", "cac", "cak", "cẹc", "buồi", "buoi",
+    "dái", "cứt", "cut", "đái", "đĩ", "điếm", "phò", "cave", "chịch", "xoạc",
+    "nứng", "dâm", "sục", "đụ", "đù", "đụmá", "đụmẹ", "đmá", "đmẹ", "mịa",
+    "clgt", "wtf", "wth", "lol", "lmao", "ngu", "đần", "cút", "bịp", "sex", "porn", "jav",
+    "haha", "hehe", "hihi", "ohehe", "hoho", "kaka", "sặc",
+}
+
+PROFANE_OR_DISRESPECTFUL_PHRASES = (
+    "bóp dái", "đá dái", "vãi l", "vãi c", "vãi đ", "vãi chưởng",
+    "cái lồn", "con cặc", "đầu buồi", "đầu bùi", "ăn cứt", "chi cứt", "cục cứt",
+    "con đĩ", "con phò", "thằng chó", "con chó", "chó đẻ", "óc chó", "óc lợn",
+    "súc vật", "khốn nạn", "mẹ kiếp", "mẹ mày", "má mày", "bố mày", "cha mày",
+    "ông nội mày", "bà nội mày", "cả lò", "tổ sư", "tiên sư", "mả cha", "mả mẹ",
+    "chết tiệt", "chết bầm", "chết mẹ", "chết cha", "hiếp dâm", "ấu dâm", "khiêu dâm",
+    "i cư", "kimochi", "yamate", "yamete", "tài xỉu", "cá độ", "nổ hũ", "nhà cái",
+    "lừa đảo", "lừa à", "te le gram", "telegram", "bố là trùm",
+    "hết trò", "làm trò", "trò hề", "câu view", "câu like", "nhảm nhí", "xàm xí",
+    "tào lao", "vớ vẩn", "rảnh háng", "báng bổ", "phỉ báng", "dị giáo", "tà đạo",
+    "giả tạo", "diễn sâu", "như thật", "chịu đấy", "chịu luôn", "vụ này luôn",
+    "hết chùa", "sang nhà thờ", "chúa giả", "phật giả", "tẩy chay", "rác rưởi",
+    "ủa alo", "ủa rồi", "lạy luôn",
+)
+
+COMPACT_BLOCKED_SUBSTRINGS = (
+    "bópdái", "bopdai", "đádái", "dadai", "đầubuồi", "daubuoi", "cáilồn", "concặc",
+    "ăncứt", "chicứt", "cụccứt", "conđĩ", "conphò", "chóđẻ", "ócchó", "súcvật",
+    "khốnnạn", "mẹkiếp", "mẹmày", "bốmày", "chếttiệt", "chếtmẹ", "hiếpdâm", "ấudâm",
+    "xnxx", "xvideos", "pornhub", "yamate", "yamete", "kimochi", "tàixỉu", "nổhũ",
+    "kubet", "sunwin", "go88", "lừađảo", "telegram", "bốlàtrùm", "đụmá", "đụmẹ",
+    "địtmẹ", "vãilồn", "vãicặc", "hếttrò", "nhưthật", "chịuđấy", "hếtchùa",
+    "sangnhàthờ", "ohehe",
+)
+
+
+def is_toxic_or_disrespectful(raw_text: str) -> bool:
+    if not raw_text:
+        return True
+    s = str(raw_text).strip()
+    if not s:
+        return True
+    if s.startswith("@") or MOCKING_EMOJI_RE.search(s) or SARCASTIC_QUESTION_RE.search(s):
+        return True
+    lower = unicodedata.normalize("NFC", unicodedata.normalize("NFKC", s)).lower()
+    words = MULTI_SPACE_RE.sub(" ", MODERATION_NON_WORD_RE.sub(" ", lower)).strip()
+    if not words:
+        return True
+    spaced = f" {words} "
+    compact = words.replace(" ", "")
+    collapsed_words = REPEATED_CHARS_RE.sub(r"\1", words)
+    collapsed_spaced = f" {collapsed_words} "
+    collapsed_compact = REPEATED_CHARS_RE.sub(r"\1", compact)
+    for tk in STANDALONE_PROFANE_TOKENS:
+        needle = f" {tk} "
+        if needle in spaced or needle in collapsed_spaced:
+            return True
+    for p in PROFANE_OR_DISRESPECTFUL_PHRASES:
+        needle = f" {p} "
+        if needle in spaced or needle in collapsed_spaced:
+            return True
+    for sub in COMPACT_BLOCKED_SUBSTRINGS:
+        if sub in compact or sub in collapsed_compact:
+            return True
+    return False
 
 
 def resolve_model_source() -> str:
@@ -77,7 +150,7 @@ def emit(payload: dict) -> None:
 
 
 def clean_and_normalize_text(raw_text: str, max_chars: int = 550) -> str:
-    if not raw_text:
+    if not raw_text or is_toxic_or_disrespectful(raw_text):
         return ""
     # 1. Chuẩn hóa NFKC (biến chữ kiểu toán học 𝒯𝒽𝒾ê𝓃 𝒯â𝓂 -> Thiên Tâm) rồi NFC
     text = unicodedata.normalize("NFC", unicodedata.normalize("NFKC", str(raw_text)))

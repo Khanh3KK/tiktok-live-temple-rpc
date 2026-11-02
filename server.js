@@ -519,7 +519,8 @@ const STANDALONE_PROFANE_TOKENS = [
   'đm', 'dm', 'đmm', 'dmm', 'đkm', 'dkm', 'đcm', 'dcm', 'đcmm', 'dcmm', 'đklm',
   'vcl', 'vl', 'vkl', 'vler', 'vll', 'vcc', 'vc', 'cc', 'cl', 'clm', 'cmm', 'cml',
   'đéo', 'deo', 'đếch', 'đệch', 'đệt', 'đjt', 'djt', 'dit', 'đit', 'địt',
-  'lồn', 'lon', 'loz', 'lờ', 'cặc', 'cac', 'cak', 'cẹc', 'buồi', 'buoi',
+  'lồn', 'lon', 'loz', 'lòn', 'l0n', 'lờ', 'cặc', 'cac', 'cak', 'cẹc', 'buồi', 'buoi',
+  'cu', 'ku', 'bú', 'liếm', 'mút', 'lùa',
   'dái', 'cứt', 'cut', 'đái', 'đĩ', 'điếm', 'phò', 'cave', 'chịch', 'xoạc',
   'nứng', 'dâm', 'sục', 'đụ', 'đù', 'đụmá', 'đụmẹ', 'đmá', 'đmẹ', 'mịa',
   'clgt', 'wtf', 'wth', 'lol', 'lmao', 'ngu', 'đần', 'cút', 'bịp', 'sex', 'porn', 'jav'
@@ -527,7 +528,9 @@ const STANDALONE_PROFANE_TOKENS = [
 
 // Nhóm B1: Cụm từ nhạy cảm, tục tĩu, bạo lực, cờ bạc, lừa đảo (kiểm tra trên spaced & collapsedSpaced)
 const PROFANE_SPACED_PHRASES = [
-  'bóp dái', 'đá dái', 'vãi l', 'vãi c', 'vãi đ', 'vãi chưởng', 'vãi cả',
+  'bóp dái', 'đá dái', 'vạch cu', 'bú cu', 'con cu', 'cái cu', 'chúa lòn', 'phật lòn',
+  'chốn lùa', 'lùa gà', 'cừi ẻ', 'cười ỉa', 'ỉa chảy',
+  'vãi l', 'vãi c', 'vãi đ', 'vãi chưởng', 'vãi cả',
   'cái lồn', 'con cặc', 'đầu buồi', 'đầu bùi', 'ăn cứt', 'chi cứt', 'cục cứt',
   'con đĩ', 'con phò', 'thằng chó', 'con chó', 'chó đẻ', 'óc chó', 'óc lợn',
   'súc vật', 'khốn nạn', 'mẹ kiếp', 'mẹ mày', 'má mày', 'bố mày', 'cha mày',
@@ -541,6 +544,7 @@ const PROFANE_SPACED_PHRASES = [
 // Nhóm B2: Chuỗi viết liền không dấu cách (kiểm tra trên compact & collapsedCompact, bắt chuẩn "thòtay sangtrái bópdái bạntrai")
 const PROFANE_COMPACT_SUBSTRINGS = [
   'bópdái', 'bopdai', 'đádái', 'dadai', 'đầubuồi', 'daubuoi', 'đầubùi',
+  'vạchcu', 'vachcu', 'búcu', 'bucu', 'chúalòn', 'chualon', 'chốnlùa', 'chonlua', 'lùagà', 'luaga', 'cừiẻ',
   'cáilồn', 'cailon', 'concặc', 'concac', 'ăncứt', 'ancut', 'chicứt', 'cụccứt',
   'conđĩ', 'conphò', 'chóđẻ', 'ócchó', 'óclợn', 'súcvật', 'khốnnạn',
   'mẹkiếp', 'mẹmày', 'mámày', 'bốmày', 'chamày', 'mảcha', 'mảmẹ',
@@ -559,6 +563,7 @@ const DISRESPECTFUL_SPACED_PHRASES = [
   'báng bổ', 'phỉ báng', 'dị giáo', 'tà đạo', 'mê tín', 'dị đoan',
   'giả tạo', 'diễn sâu', 'như thật', 'chịu đấy', 'chịu luôn', 'vụ này luôn', 'vụ mới',
   'hết chùa', 'sang nhà thờ', 'chúa giả', 'phật giả', 'ai đọc', 'giọng ai',
+  'dẹp cái này', 'dẹp đi', 'dẹp mẹ', 'bày đặt', 'lệch lạc', 'sai giáo lý', 'như cái chùa', 'như chùa', 'ảo ma', 'ảo thật',
   'tẩy chay', 'báo cáo', 'report', 'kinh tởm', 'rác rưởi', 'bẩn thỉu',
   'xuống địa ngục', 'quỷ tha ma bắt', 'ma quỷ', 'quỷ sứ', 'xui xẻo', 'tai họa', 'trù ẻo',
   'chán đời', 'tuyệt vọng', 'muốn chết', 'hận thù', 'oán hận',
@@ -570,12 +575,14 @@ const DISRESPECTFUL_COMPACT_SUBSTRINGS = [
   'nhảmnhí', 'xàmxí', 'tàolao', 'vớvẩn', 'rảnhháng', 'bángbổ', 'phỉbáng',
   'dịgiáo', 'tàđạo', 'mêtín', 'dịđoan', 'giảtạo', 'diễnsâu', 'nhưthật',
   'chịuđấy', 'chịuluôn', 'vụnàyluôn', 'hếtchùa', 'sangnhàthờ', 'chúagiả', 'phậtgiả',
+  'dẹpcáinày', 'dẹpđi', 'bàyđặt', 'lệchlạc', 'saigiáolý', 'nhưcáichùa',
   'tẩychay', 'kinhtởm', 'rácrưởi', 'bẩnthỉu', 'xuốngđịangục', 'quỷthama',
   'trùẻo', 'oánhận', 'ủarồi', 'ủaalo', 'ohehe'
 ];
 
 const MOCKING_LAUGH_TOKENS = [
-  'haha', 'hahaha', 'hehe', 'hehehe', 'hihi', 'hihihi', 'ohehe', 'hoho', 'kaka', 'kakaka', 'sặc'
+  'haha', 'hahaha', 'hehe', 'hehehe', 'hihi', 'hihihi', 'ohehe', 'hoho', 'kaka', 'kakaka', 'sặc',
+  'kkk', 'kkkk', 'kkkkk', 'hjhj', 'hjx'
 ];
 
 const MOCKING_EMOJI_RE = /[🤣😂😆😜🤪🤡💩🖕🤮🤢]/u;
@@ -1214,26 +1221,23 @@ function parseViewerComment(commentText, user, uniqueId, avatar) {
     return Rituals.burnIncense({ user: cleanUser, uniqueId, avatar, count: 3, wish: cleanWish });
   }
 
-  // 5. Cầu nguyện / Thả đèn hoa đăng
-  if (
-    lower.includes('cầu') ||
-    lower.includes('cau ') ||
-    lower.includes('nguyện') ||
-    lower.includes('nguyen') ||
-    lower.includes('nam mô') ||
-    lower.includes('nam mo') ||
-    lower.includes('mô phật') ||
-    lower.includes('mo phat') ||
-    lower.includes('a di đà') ||
-    lower.includes('a di da') ||
-    lower.includes('bình an') ||
-    lower.includes('tài lộc') ||
-    lower.includes('chúc')
-  ) {
+  // 5. Cầu nguyện / Thả đèn hoa đăng (Whitelist nghiêm ngặt chỉ nhận lời cầu nguyện / chúc lành tích cực)
+  const TEMPLE_PRAYER_WHITELIST = [
+    'cầu', 'cau ', 'nguyện', 'nguyen', 'xin', 'phật', 'phat', 'bồ tát', 'bo tat',
+    'quan âm', 'quan am', 'di đà', 'di da', 'nam mô', 'nam mo', 'mô phật', 'mo phat',
+    'a di đà', 'a di da', 'bình an', 'binh an', 'sức khỏe', 'suc khoe', 'gia đình', 'gia dinh',
+    'gia đạo', 'gia dao', 'cha mẹ', 'bố mẹ', 'ba má', 'ông bà', 'con cái', 'tài lộc', 'tai loc',
+    'may mắn', 'may man', 'vạn sự', 'van su', 'như ý', 'nhu y', 'cát tường', 'cat tuong',
+    'phù hộ', 'phu ho', 'độ trì', 'do tri', 'công đức', 'cong duc', 'thành tâm', 'thanh tam',
+    'cảm tạ', 'cam ta', 'sám hối', 'sam hoi', 'hoan hỷ', 'hoan hy', 'an lạc', 'an lac',
+    'tịnh tâm', 'tinh tam', 'chúc', 'lạy', 'kính'
+  ];
+  if (TEMPLE_PRAYER_WHITELIST.some((kw) => lower.includes(kw))) {
     return Rituals.sendPrayer({ user: cleanUser, uniqueId, avatar, wish: cleanWish });
   }
 
-  return Rituals.burnIncense({ user: cleanUser, uniqueId, avatar, count: 1, wish: cleanWish });
+  // Bỏ qua mọi bình luận tán gẫu ngẫu nhiên không nằm trong danh mục cầu nguyện để giữ màn hình trang nghiêm
+  return null;
 }
 
 const giftComboTracker = new Map();
@@ -2409,21 +2413,22 @@ function parseChurchViewerComment(commentText, user, uniqueId, avatar) {
     return ChurchRituals.lightCandle({ user: cleanUser, uniqueId, avatar, count: 3, wish: cleanWish });
   }
 
-  // 6. Cầu Nguyện / Thả Bồ Câu Trắng
-  if (
-    lower.includes('cầu') ||
-    lower.includes('nguyện') ||
-    lower.includes('xin chúa') ||
-    lower.includes('lạy chúa') ||
-    lower.includes('amen') ||
-    lower.includes('alleluia') ||
-    lower.includes('haleluia') ||
-    lower.includes('bình an')
-  ) {
+  // 6. Cầu Nguyện / Thả Bồ Câu Trắng (Whitelist nghiêm ngặt chỉ nhận lời cầu nguyện / tạ ơn Chúa trang nghiêm)
+  const CHURCH_PRAYER_WHITELIST = [
+    'cầu', 'cau ', 'nguyện', 'nguyen', 'xin', 'chúa', 'chua', 'giêsu', 'giesu', 'jesus',
+    'mẹ maria', 'đức mẹ', 'duc me', 'maria', 'thánh', 'thanh ', 'giuse', 'amen',
+    'alleluia', 'haleluia', 'hallelujah', 'bình an', 'binh an', 'sức khỏe', 'suc khoe',
+    'gia đình', 'gia dinh', 'cha mẹ', 'bố mẹ', 'ba má', 'ông bà', 'con cái', 'chúc lành', 'chuc lanh',
+    'thương xót', 'thuong xot', 'phù hộ', 'phu ho', 'che chở', 'che cho', 'chở che',
+    'hồng ân', 'hong an', 'cảm tạ', 'cam ta', 'ngợi khen', 'ngoi khen', 'vinh danh',
+    'tín thác', 'tin thac', 'hiệp thông', 'hiep thong', 'lạy', 'kính', 'dâng', 'chúc'
+  ];
+  if (CHURCH_PRAYER_WHITELIST.some((kw) => lower.includes(kw))) {
     return ChurchRituals.sendPrayer({ user: cleanUser, uniqueId, avatar, wish: cleanWish });
   }
 
-  return ChurchRituals.lightCandle({ user: cleanUser, uniqueId, avatar, count: 1, wish: cleanWish });
+  // Bỏ qua mọi bình luận tán gẫu ngẫu nhiên không nằm trong danh mục cầu nguyện để giữ màn hình trang nghiêm
+  return null;
 }
 
 let churchAutoSimTimer = null;

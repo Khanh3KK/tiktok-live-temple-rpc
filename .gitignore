@@ -7,3 +7,6 @@ data/tts-cache/
 *.log
 *.m4a
 public/assets/bg_chant.m4a
+exports/mp3_full/
+exports/mp3_shorts/
+exports/videos_tiktok/

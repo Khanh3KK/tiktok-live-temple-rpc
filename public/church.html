@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#070c1f" />
+  <title>Thánh Đường Hồng Ân Online — TikTok Live RPC (Lễ Đài Chúa Giêsu 9:16)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Noto+Serif:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/church.css?v=28" />
+</head>
+<body>
+  <div class="app-workspace">
+    <!-- ====================================================================
+         KHUNG 9:16 CHUẨN TIKTOK LIVE / OBS BROWSER SOURCE (1080 x 1920)
+         ==================================================================== -->
+    <div class="stage-wrapper" id="stageWrapper">
+      <div class="stage-9x16" id="stage9x16">
+        <!-- 1. HÌNH NỀN CUNG THÁNH & LỄ ĐÀI CHÚA GIÊSU SẮC NÉT -->
+        <img
+          src="/assets/church_stage.jpg?v=21"
+          alt="Cung Thánh Lễ Đài Chúa Giêsu"
+          class="sanctuary-bg-img"
+        />
+
+        <!-- 1B. HỆ THỐNG HÀO QUANG THÁNH GIÁ & CỬA SỔ HOA HỒNG PHÍA SAU CHÚA -->
+        <div class="christ-halo-system" id="christHaloSystem">
+          <div class="halo-sunburst"></div>
+          <div class="halo-pulse-ring ring-1"></div>
+          <div class="halo-pulse-ring ring-2"></div>
+          <svg class="halo-cross-svg" viewBox="0 0 680 680">
+            <g class="rose-window-outer" stroke="#fff4b8" fill="none">
+              <circle cx="340" cy="340" r="295" stroke-width="2.2" stroke-dasharray="16 10" stroke-opacity="0.78" />
+              <circle cx="340" cy="340" r="252" stroke-width="1.8" stroke-dasharray="6 8" stroke-opacity="0.65" />
+              <circle cx="340" cy="340" r="210" stroke-width="2.5" stroke-opacity="0.72" />
+            </g>
+            <g class="rose-window-inner" stroke="#ffe47a" fill="none">
+              <circle cx="340" cy="340" r="168" stroke-width="2.2" stroke-dasharray="22 12" stroke-opacity="0.85" />
+              <circle cx="340" cy="340" r="134" stroke-width="1.6" stroke-opacity="0.65" />
+              <!-- Tia Thánh Giá Ánh Sáng -->
+              <line x1="340" y1="28" x2="340" y2="652" stroke="#fff7cc" stroke-width="2.4" stroke-opacity="0.55" />
+              <line x1="28" y1="340" x2="652" y2="340" stroke="#fff7cc" stroke-width="2.4" stroke-opacity="0.55" />
+            </g>
+          </svg>
+        </div>
+
+        <!-- HÀO QUANG THÁNH TÂM CHÚA GIÊSU -->
+        <div class="sacred-heart-halo" id="sacredHeartHalo"></div>
+
+        <!-- 2. THANH TRẠNG THÁI MỎNG TRÊN ĐỈNH (KHÔNG CHE TƯỢNG CHÚA) -->
+        <header class="minimal-top-bar">
+          <div class="live-pill" id="liveStatusPill">
+            <span class="live-dot" id="liveDot"></span>
+            <span id="liveStatusText">THÁNH ĐƯỜNG HỒNG ÂN • LỄ ĐÀI CHÚA GIÊSU</span>
+          </div>
+          <div class="top-Right-badges">
+            <div class="mini-stat-pill">
+              🕯️ <strong id="statCandles">120</strong> nến • ✨ <strong id="statGrace">1,200</strong> ÂP
+            </div>
+          </div>
+        </header>
+
+        <!-- 2A. DẢI CHÀO ĐÓN TÍN HỮU MỚI BƯỚC VÀO THÁNH ĐƯỜNG (ẨN HOÀN TOÀN ĐỂ KHÔNG CHE MẶT CHÚA) -->
+        <div class="welcome-ticker-bar" id="welcomeTickerBar" style="display: none !important;">
+          <span class="welcome-ticker-prefix">✨ Nguyện xin Chúa Giêsu ban bình an xuống trên gia đình quý tín hữu •</span>
+          <span class="welcome-ticker-names" id="welcomeTickerNames">Chào đón quý ông bà và anh chị em hiệp thông nơi Thánh Đường Hồng Ân</span>
+        </div>
+
+        <!-- 2B. CUỘN KINH THÁNH & PHỤ ĐỀ LỜI CHÚA TRÊN CUNG THÁNH -->
+        <div class="scripture-scroll-banner" id="scriptureScrollBanner">
+          <div class="scripture-scroll-header">
+            <span class="scripture-status-badge" id="scriptureStatusBadge">📖 ĐANG ĐỌC LỜI CHÚA</span>
+            <span class="scripture-title-text" id="scriptureBannerTitle">Kinh Hòa Bình của Thánh Phanxicô Assisi</span>
+            <span class="scripture-verse-counter" id="scriptureVerseCounter">Câu 1/10</span>
+          </div>
+          <div class="scripture-verse-body" id="scriptureVerseText">
+            “Lạy Chúa từ nhân, xin cho con biết mến yêu và phụng sự Chúa trong mọi người. Lạy Chúa, xin hãy dùng con như khí cụ bình an của Chúa.”
+          </div>
+        </div>
+
+        <!-- 3. LUỒNG SÁNG THIÊN ĐÀNG & GIÀN NẾN PHỤNG VỤ TRUNG TÂM -->
+        <div class="sacred-light-beam" id="sacredLightBeam"></div>
+
+        <div class="candle-altar-zone" id="candleAltarZone" title="Bấm để Thắp Nến Cầu Nguyện Trên Lễ Đài Chúa">
+          <div class="votive-candles-holder" id="votiveCandlesHolder"></div>
+        </div>
+
+        <!-- VẬT PHẨM PHỤNG VỤ TƯƠNG TÁC HAI BÊN LỄ ĐÀI: LỜI CHÚA, CHUÔNG THÁNH ĐƯỜNG, MÂN CÔI & LỘC THÁNH -->
+        <div class="ritual-hotspot scripture-hotspot" id="scriptureStation" title="Bấm để Thỉnh Lời Chúa / Đổi Bài Đọc Thánh Vịnh">
+          <span class="hotspot-icon">📖</span>
+          <span class="hotspot-label">Lời Chúa</span>
+        </div>
+
+        <div class="ritual-hotspot bell-hotspot" id="churchBellStation" title="Bấm để Ngân Chuông Thánh Đường">
+          <span class="hotspot-icon">🔔</span>
+          <span class="hotspot-label">Chuông Thánh</span>
+        </div>
+
+        <div class="ritual-hotspot rosary-hotspot" id="rosaryStation" title="Bấm để Lần Hạt Mân Côi">
+          <span class="hotspot-icon">📿</span>
+          <span class="hotspot-label">Mân Côi (<span id="statRosary">500</span>)</span>
+        </div>
+
+        <div class="ritual-hotspot blessing-hotspot" id="bibleBlessingStation" title="Bấm để Đón Nhận Lời Chúa (Tin Mừng)">
+          <span class="hotspot-icon">📖</span>
+          <span class="hotspot-label">Lời Chúa</span>
+        </div>
+
+        <!-- 4. BA VỊ TRÍ TÍN HỮU DÂNG NẾN TRƯỚC CUNG THÁNH (TRÁI - GIỮA - PHẢI) + HÀNG CHỜ TRANG NGHIÊM -->
+        <div class="walker-queue-badge" id="walkerQueueBadge" style="display: none;">
+          🕯️ Hàng chờ dâng nến: <strong id="walkerQueueCount">0</strong> tín hữu
+        </div>
+
+        <!-- Vị trí dâng nến 1 (Chính Giữa Thảm Đỏ) -->
+        <div class="central-worshipper" id="centralWorshipper" data-lane="0">
+          <div class="worshipper-wish-bubble" id="centralWishBubble">
+            “Lạy Chúa Giêsu, con tín thác vào Chúa”
+          </div>
+          <div class="central-sprite-stack" id="centralSpriteStack">
+            <img src="/assets/catholic_female_walk.png?v=21" data-pose="walk1" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_female_walk_2.png?v=21" data-pose="walk2" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_female_kneel_down.png?v=21" data-pose="kneelDown" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_female_kneel.png?v=21" data-pose="kneel" class="devotee-sprite pose-frame active" alt="" />
+            <img src="/assets/catholic_female_bow.png?v=21" data-pose="forehead" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_female_bow_mid.png?v=21" data-pose="bowMid" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_female_prostrate.png?v=21" data-pose="prostrate" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_female_prostrate_deep.png?v=21" data-pose="prostrateDeep" class="devotee-sprite pose-frame" alt="" />
+          </div>
+          <div class="name-tag central-name-tag">
+            <div class="tag-avatar" id="centralAvatar">✝️</div>
+            <div class="tag-texts">
+              <div class="tag-sub" id="centralAction">🕯️ DÂNG NẾN • +15 ÂP</div>
+              <div class="tag-name" id="centralName">Tín Hữu Maria Thảo</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vị trí dâng nến 2 (Bục Quỳ Trái - Chỉ hiện khi nhiều người cùng bước lên dâng nến) -->
+        <div class="central-worshipper side-worshipper left-worshipper" id="leftWorshipper" data-lane="1" style="display: none;">
+          <div class="worshipper-wish-bubble side-wish-bubble" id="leftWishBubble">
+            “Xin Chúa ban bình an”
+          </div>
+          <div class="central-sprite-stack" id="leftSpriteStack">
+            <img src="/assets/catholic_male_walk.png?v=21" data-pose="walk1" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_male_walk_2.png?v=21" data-pose="walk2" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_male_kneel_down.png?v=21" data-pose="kneelDown" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_male_kneel.png?v=21" data-pose="kneel" class="devotee-sprite pose-frame active" alt="" />
+            <img src="/assets/catholic_male_bow.png?v=21" data-pose="forehead" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_male_bow_mid.png?v=21" data-pose="bowMid" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_male_prostrate.png?v=21" data-pose="prostrate" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_male_prostrate_deep.png?v=21" data-pose="prostrateDeep" class="devotee-sprite pose-frame" alt="" />
+          </div>
+          <div class="name-tag central-name-tag side-name-tag">
+            <div class="tag-avatar" id="leftAvatar">🕯️</div>
+            <div class="tag-texts">
+              <div class="tag-sub" id="leftAction">🕯️ DÂNG NẾN</div>
+              <div class="tag-name" id="leftName">Tín Hữu Ân Nhân</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vị trí dâng nến 3 (Bục Quỳ Phải - Chỉ hiện khi nhiều người cùng bước lên dâng nến) -->
+        <div class="central-worshipper side-worshipper right-worshipper" id="rightWorshipper" data-lane="2" style="display: none;">
+          <div class="worshipper-wish-bubble side-wish-bubble" id="rightWishBubble">
+            “Tạ ơn Chúa chúc lành”
+          </div>
+          <div class="central-sprite-stack" id="rightSpriteStack">
+            <img src="/assets/catholic_female_walk.png?v=21" data-pose="walk1" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_female_walk_2.png?v=21" data-pose="walk2" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_female_kneel_down.png?v=21" data-pose="kneelDown" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_female_kneel.png?v=21" data-pose="kneel" class="devotee-sprite pose-frame active" alt="" />
+            <img src="/assets/catholic_female_bow.png?v=21" data-pose="forehead" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_female_bow_mid.png?v=21" data-pose="bowMid" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_female_prostrate.png?v=21" data-pose="prostrate" class="devotee-sprite pose-frame" alt="" />
+            <img src="/assets/catholic_female_prostrate_deep.png?v=21" data-pose="prostrateDeep" class="devotee-sprite pose-frame" alt="" />
+          </div>
+          <div class="name-tag central-name-tag side-name-tag">
+            <div class="tag-avatar" id="rightAvatar">🕯️</div>
+            <div class="tag-texts">
+              <div class="tag-sub" id="rightAction">🕯️ DÂNG NẾN</div>
+              <div class="tag-name" id="rightName">Tín Hữu Hiệp Thông</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4B. BỐI CẢNH CUNG THÁNH HÀNH LỄ THÁNH ĐƯỜNG (CHA CHỦ TẾ - GIẢNG ĐÀI SÁCH THÁNH - LỄ SINH - ĐỐI ĐÁP CỘNG ĐOÀN) -->
+        <div class="mass-sanctuary-stage" id="massSanctuaryStage">
+          <!-- Người Đọc Sách Thánh & Đáp Ca tại Giảng Đài (Cánh Trái Cung Thánh) -->
+          <div class="mass-actor mass-lector-actor" id="massLectorActor">
+            <div class="mass-actor-bubble lector-bubble" id="massLectorBubble">
+              “Lời Chúa là ngọn đèn soi cho con bước...”
+            </div>
+            <div class="mass-actor-halo"></div>
+            <img src="/assets/catholic_female_walk.png?v=23" class="mass-lector-sprite" alt="Người Đọc Sách Thánh" />
+            <div class="mass-ambo-podium">📖</div>
+            <div class="mass-actor-badge">
+              <span class="mass-badge-role" id="massLectorRoleTag">📖 ĐỌC SÁCH THÁNH</span>
+              <span class="mass-badge-name" id="massLectorNameTag">Ca Trưởng Kim Oanh</span>
+            </div>
+          </div>
+
+          <!-- Lễ Sinh Giúp Lễ Trái (Cầm Chuông Cung Thánh) -->
+          <div class="mass-actor mass-server-actor server-left" id="massServerLeft">
+            <img src="/assets/catholic_male_kneel.png?v=23" class="mass-server-sprite" id="massServerLeftSprite" alt="Lễ Sinh" />
+            <div class="mass-server-badge">🔔 Lễ Sinh</div>
+          </div>
+
+          <!-- CHA CHỦ TẾ (Đứng Chính Giữa Trước Bàn Thờ Chúa) -->
+          <div class="mass-actor mass-priest-actor active-speaker" id="massPriestActor">
+            <div class="mass-actor-bubble priest-bubble" id="massPriestBubble">
+              “Nhân danh Cha, và Con, và Thánh Thần. Bình an của Chúa ở cùng anh chị em.”
+            </div>
+            <div class="mass-priest-halo"></div>
+            <div class="mass-priest-sprite-stack" id="massPriestSpriteStack">
+              <img src="/assets/catholic_priest_orans.png?v=23" data-priest-pose="orans" class="mass-priest-pose active" alt="Cha Chủ Tế" />
+              <img src="/assets/catholic_priest_folded.png?v=23" data-priest-pose="folded" class="mass-priest-pose" alt="Cha Chủ Tế" />
+              <img src="/assets/catholic_priest_elevation.png?v=23" data-priest-pose="elevation" class="mass-priest-pose" alt="Cha Chủ Tế Truyền Phép" />
+              <img src="/assets/catholic_priest_blessing.png?v=23" data-priest-pose="blessing" class="mass-priest-pose" alt="Cha Chủ Tế Ban Phép Lành" />
+            </div>
+            <div class="mass-actor-badge priest-badge">
+              <span class="mass-badge-role" id="massPriestRoleTag">✝️ LINH MỤC CHỦ TẾ</span>
+              <span class="mass-badge-name">Cha Chủ Tế Hữu Đức</span>
+            </div>
+          </div>
+
+          <!-- Lễ Sinh Giúp Lễ Phải (Cầm Nến Chầu) -->
+          <div class="mass-actor mass-server-actor server-right" id="massServerRight">
+            <img src="/assets/catholic_male_kneel.png?v=23" class="mass-server-sprite" id="massServerRightSprite" alt="Lễ Sinh" />
+            <div class="mass-server-badge">🕯️ Lễ Sinh</div>
+          </div>
+
+          <!-- Băng Rôn Bóng Thoại Khi Cộng Đoàn Đồng Thanh Đáp Lời -->
+          <div class="mass-congregation-response-banner" id="massCongregationBanner">
+            <span class="congregation-resp-label">🙏 CỘNG ĐOÀN ĐỒNG THANH ĐÁP:</span>
+            <span class="congregation-resp-text" id="massCongregationText">“Amen. Và ở cùng Cha.”</span>
+          </div>
+        </div>
+
+        <!-- 5. HÀNG GHẾ DANH DỰ ĐẦU CUNG THÁNH & BỤC QUỲ ĐÔI (TOP ÂN NHÂN) -->
+        <div class="vip-cushions-layer" id="vipCushionsLayer"></div>
+
+        <!-- 6. HÀNG GHẾ GỖ CỘNG ĐOÀN HIỆP THÔNG HAI BÊN THẢM ĐỎ -->
+        <div class="congregation-hall" id="congregationHall"></div>
+
+        <!-- 7. LỚP TIỀN CẢNH ĐẦU HỒI GHẾ GỖ 2.5D CHE CHẮN TỰ NHIÊN -->
+        <img src="/assets/church_pews_fg.png?v=11" class="church-pews-fg" alt="" />
+
+        <!-- 8. CÁNH BỒ CÂU TRẮNG / THIỆP Ý NGUYỆN DÂNG CHÚA BAY LÊN -->
+        <div class="sky-lanterns-layer" id="skyLanternsLayer"></div>
+
+        <!-- 9. LỚP CANVAS HIỆU ỨNG ÁNH NẾN, HOA HUỆ TRẮNG RƠI & SÓNG ÂM CHUÔNG THÁNH -->
+        <canvas id="churchCanvas"></canvas>
+
+        <!-- 10. THANH HUD GỌN GÀNG DƯỚI ĐÁY -->
+        <footer class="bottom-hud-bar">
+          <div class="hud-left-col">
+            <div class="hud-active-notice" id="hudActiveNotice">
+              <span class="flower-bullet">✝️</span>
+              <strong id="devoteeNameLine">Tín Hữu Maria Thảo</strong>
+              <span>—</span>
+              <span id="devoteeActionTag">Dâng nến tạ ơn Chúa</span>
+              <span class="flower-bullet">🕊️</span>
+            </div>
+
+            <div class="hud-gift-cards">
+              <div class="hud-gift-card" id="cardCandle" title="Bấm để Thắp nến cầu nguyện">
+                <div class="gift-coin-tag">1 COIN / CMT</div>
+                <div class="gift-card-body">
+                  <span class="gift-emoji">🕯️</span>
+                  <span class="gift-title">Thắp nến</span>
+                </div>
+              </div>
+
+              <div class="hud-gift-card" id="cardPrayer" title="Bấm để Dâng ý nguyện & Thả bồ câu trắng">
+                <div class="gift-coin-tag">5 COINS / TIM</div>
+                <div class="gift-card-body">
+                  <span class="gift-emoji">🕊️</span>
+                  <span class="gift-title">Cầu nguyện</span>
+                </div>
+              </div>
+
+              <div class="hud-gift-card" id="cardLily" title="Bấm để Dâng Hoa Huệ Trắng lên Bàn Thờ Chúa">
+                <div class="gift-coin-tag">10+ COINS</div>
+                <div class="gift-card-body">
+                  <span class="gift-emoji">🌹</span>
+                  <span class="gift-title">Hoa huệ</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bên phải: Bảng BẢNG VÀNG ÂN PHÚC (Top Ân Nhân) -->
+          <div class="hud-right-leaderboard">
+            <div class="hud-lb-header">BẢNG VÀNG ÂN PHÚC</div>
+            <div class="hud-lb-list" id="leaderboardList"></div>
+          </div>
+        </footer>
+
+        <!-- BANNER ĐẠI LỄ ÁNH SÁNG PHỤC SINH & PHÉP LÀNH TRỌNG THỂ -->
+        <div class="grand-ceremony-banner" id="grandCeremonyBanner">
+          <div class="grand-title" id="grandTitle">👼 ĐẠI LỄ ÁNH SÁNG PHỤC SINH 👼</div>
+          <div class="grand-sub" id="grandSub">Hồng ân Thiên Chúa: Ân Nhân tiến dâng lễ vật</div>
+        </div>
+
+        <!-- MODAL THIỆP LỘC THÁNH LỜI CHÚA -->
+        <div class="fortune-modal-overlay" id="blessingModal">
+          <div class="fortune-scroll-card">
+            <div class="fortune-badge" id="blessingRankBadge">HỒNG ÂN THƯỢNG ĐẲNG • THÁNH VỊNH 23</div>
+            <div class="fortune-heading" id="blessingTitle">Lộc Thánh Số 1 — Chúa Là Mục Tử Chăn Dắt Đời Con</div>
+            <div class="fortune-devotee" id="blessingDevotee">Tín hữu đón nhận Lời Chúa: Maria Thảo</div>
+            <div class="fortune-poem" id="blessingPoem"></div>
+            <div class="fortune-meaning" id="blessingMeaning"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         BẢNG ĐIỀU KHIỂN NHANH RPC & GIẢ LẬP NHÀ THỜ (ẨN KHI ?obs=1)
+         ==================================================================== -->
+    <aside class="quick-dock" id="quickDock">
+      <div class="dock-header">
+        <div class="dock-title">⛪ Điều Khiển Nhà Thờ & RPC</div>
+        <a href="/church-admin" target="_blank" class="dock-link">Admin Nhà Thờ ↗</a>
+      </div>
+
+      <!-- Chuyển đổi nhanh Đi Chùa <-> Đi Nhà Thờ -->
+      <div class="workflow-switcher">
+        <a href="/" class="workflow-tab">🪷 Đi Chùa (Phật)</a>
+        <a href="/church" class="workflow-tab active">⛪ Đi Nhà Thờ (Chúa)</a>
+      </div>
+
+      <div class="dock-section">
+        <div class="dock-section-title">🔊 Nhạc Thánh Ca & Giọng Đọc Lời Nguyện</div>
+        <button class="dock-btn gold" id="btnUnlockAudio">
+          🔔 Bật Nhạc Thánh Đường & Giọng Đọc
+        </button>
+        <div class="dock-grid-2">
+          <button class="dock-btn active-toggle" id="btnToggleTts">🎙️ Giọng Đọc: BẬT</button>
+          <button class="dock-btn active-toggle" id="btnToggleMusic">🎵 Thánh Ca: BẬT</button>
+        </div>
+        <div class="volume-control-row">
+          <div class="volume-label-line">
+            <span>🎵 Âm lượng Đàn Đại Phong Cầm & Thánh Ca</span>
+            <strong id="valMusicVol">36%</strong>
+          </div>
+          <input type="range" id="sliderMusicVol" class="volume-slider" min="0" max="100" value="36" />
+        </div>
+        <div class="volume-control-row">
+          <div class="volume-label-line">
+            <span>🎙️ Âm lượng Đọc Khấn Khán Giả (Phụ)</span>
+            <strong id="valTtsVol">30%</strong>
+          </div>
+          <input type="range" id="sliderTtsVol" class="volume-slider" min="0" max="100" value="30" />
+        </div>
+      </div>
+
+      <div class="dock-section mass-control-dock">
+        <div class="dock-section-title">⛪ Nghi Thức Hành Lễ Nhà Thờ (12–15 Phút)</div>
+        <div class="mass-status-line" id="dockMassStatusLine">
+          Trạng thái: <strong>📖 Chế độ Đọc Kinh Thường</strong>
+        </div>
+        <div class="dock-grid-2">
+          <button class="dock-btn gold" id="btnStartMassNow">🔔 Bắt Đầu Hành Lễ Ngay</button>
+          <button class="dock-btn" id="btnStopMassNow">⏹️ Về Đọc Kinh Thường</button>
+        </div>
+        <div class="dock-grid-2">
+          <button class="dock-btn" id="btnNextMassPart">⏭️ Chuyển Phần Lễ (I→IV)</button>
+          <button class="dock-btn" id="btnNextMassStep">⏩ Qua Bước Tiếp</button>
+        </div>
+        <button class="dock-btn active-toggle" id="btnToggleMassSchedule">
+          ⏰ Tự Động Mở Lễ Đúng Giờ (5h–7h, 12h, 17h–22h): BẬT
+        </button>
+      </div>
+
+      <div class="dock-section">
+        <div class="dock-section-title">📖 Lời Chúa, Thánh Vịnh & Suy Niệm (ZeroTTS)</div>
+        <div class="dock-grid-2">
+          <button class="dock-btn active-toggle" id="btnToggleScripture">📖 Lời Chúa: BẬT</button>
+          <button class="dock-btn gold" id="btnRpcRequestScripture">✝️ Thỉnh Lời Chúa (+15 ÂP)</button>
+        </div>
+        <select id="selectScriptureDeck" class="dock-input">
+          <option value="kinh_hoa_binh">✝️ Kinh Hòa Bình — Thánh Phanxicô Assisi (32 câu)</option>
+          <option value="thanh_vinh_23">📖 Thánh Vịnh 23, 91 & 121 — Chúa Chăn Dắt Tôi (32 câu)</option>
+          <option value="tam_moi_phuc_that">🕊️ Tin Mừng Mátthêu — Tám Mối Phúc Thật (32 câu)</option>
+          <option value="bai_ca_duc_ai">❤️ Thư Thánh Phaolô — Bài Ca Đức Ái (32 câu)</option>
+          <option value="kinh_cau_binh_an_gia_dinh">🌹 Kinh Phó Dâng Gia Đình & Thảo Kính Cha Mẹ (32 câu)</option>
+          <option value="suy_niem_chua_quan_phong">✨ Suy Niệm Tin Mừng — Bình An Chúa Quan Phòng (32 câu)</option>
+          <option value="kinh_long_chua_thuong_xot">🙏 Kinh Lòng Chúa Thương Xót & Chuỗi Tín Thác (32 câu)</option>
+          <option value="kinh_man_coi_duc_me">📿 Chuỗi Kinh Mân Côi & Kinh Đức Mẹ Maria (32 câu)</option>
+          <option value="kinh_thanh_giuse_cong_viec">🛠️ Kinh Ông Thánh Giuse — Cầu Công Việc & Gia Đình (32 câu)</option>
+          <option value="kinh_toi_gia_dinh">🌙 Giờ Kinh Tối Gia Đình — Tạ Ơn & Ngủ Bình An (32 câu)</option>
+        </select>
+        <div class="dock-input-row">
+          <select id="selectScriptureVoice" class="dock-input" title="Chọn giọng AI đọc Lời Chúa">
+            <option value="huuduc">🎙️ Giọng Hữu Đức (Nam Trầm Trang Nghiêm)</option>
+            <option value="quangminh">🎙️ Giọng Quang Minh (Nam Ấm Áp)</option>
+            <option value="tiendat">🎙️ Giọng Tiến Đạt (Nam Điềm Đạm)</option>
+            <option value="giahuy">🎙️ Giọng Gia Huy (Nam Truyền Cảm)</option>
+            <option value="maichi">🎙️ Giọng Mai Chi (Nữ Dịu Dàng)</option>
+            <option value="baotrang">🎙️ Giọng Bảo Trang (Nữ Thanh Thoát)</option>
+          </select>
+        </div>
+        <div class="dock-grid-2">
+          <button class="dock-btn" id="btnScripturePrev">⏮ Câu Trước</button>
+          <button class="dock-btn" id="btnScriptureNext">⏭ Câu Tiếp</button>
+        </div>
+        <div class="volume-control-row">
+          <div class="volume-label-line">
+            <span>📖 Âm lượng Đọc Lời Chúa (Ưu tiên #1)</span>
+            <strong id="valScriptureVol">100%</strong>
+          </div>
+          <input type="range" id="sliderScriptureVol" class="volume-slider" min="0" max="100" value="100" />
+        </div>
+      </div>
+
+      <div class="dock-section">
+        <div class="dock-section-title">📡 Kết Nối Phòng TikTok Live</div>
+        <div class="dock-input-row">
+          <input type="text" id="inputTikTokUser" class="dock-input" value="@zenfacts_vn" placeholder="Nhập @username hoặc link TikTok Live..." />
+          <button class="dock-btn gold" id="btnConnectTikTok">Kết Nối</button>
+        </div>
+        <button class="dock-btn" id="btnToggleAutoSim">
+          🤖 Tự động Giả lập Giáo Dân: TẮT
+        </button>
+      </div>
+
+      <div class="dock-section">
+        <div class="dock-section-title">✝️ Kích Hoạt Nghi Thức Phụng Vụ (RPC)</div>
+        <input type="text" id="inputDevoteeName" class="dock-input" value="Maria_Thảo" placeholder="Tên người xem / Tín hữu..." />
+        <input type="text" id="inputDevoteeWish" class="dock-input" value="Lạy Chúa Giêsu, con tín thác vào Chúa. Xin chúc lành cho gia đình con" placeholder="Ý nguyện dâng Chúa..." />
+
+        <div class="dock-grid-2">
+          <button class="dock-btn gold" id="btnRpcSeatViewer">🪑 Vào Ghế Ngồi</button>
+          <button class="dock-btn gold" id="btnRpcCandle">🕯️ Dâng 3 Ngọn Nến</button>
+          <button class="dock-btn" id="btnRpcDove">🕊️ Dâng Lời Nguyện</button>
+          <button class="dock-btn" id="btnRpcRosary">📿 Lần Hạt Mân Côi (+5)</button>
+          <button class="dock-btn" id="btnRpcBell">🔔 Chuông Thánh Đường</button>
+          <button class="dock-btn" id="btnRpcBlessing">📖 Đón Nhận Lời Chúa</button>
+        </div>
+        <button class="dock-btn gold" id="btnRpcGrandBlessing">
+          👼 Đại Lễ Ánh Sáng Phục Sinh (Quà Lớn)
+        </button>
+      </div>
+
+      <div class="dock-section">
+        <div class="dock-section-title">💬 Bình Luận Khán Giả — Bấm 🔊 Để Mai Chi Xướng Tên</div>
+        <div class="dock-input-row">
+          <input type="text" id="inputCustomMaiChi" class="dock-input" placeholder="Hoặc gõ câu bất kỳ để Mai Chi đọc..." />
+          <button class="dock-btn gold" id="btnSpeakCustomMaiChi">🔊 Mai Chi Đọc</button>
+        </div>
+        <div style="font-size: 11.5px; color: #b9c9ee; margin-top: -2px;">
+          💡 Di chuột vào danh sách để giữ đứng yên, bấm <strong>🔊 Xướng tên</strong> ở bình luận bất kỳ:
+        </div>
+        <div class="event-feed" id="eventFeed"></div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="/js/scriptures.js?v=28"></script>
+  <script src="/js/mass-liturgy.js?v=28"></script>
+  <script src="/js/church-audio.js?v=28"></script>
+  <script src="/js/particles.js?v=28"></script>
+  <script src="/js/church-live.js?v=28"></script>
+</body>
+</html>

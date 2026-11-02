@@ -1,0 +1,9 @@
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+data/tts-cache/
+.DS_Store
+*.log
+*.m4a
+public/assets/bg_chant.m4a

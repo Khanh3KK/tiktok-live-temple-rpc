@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bảng Điều Khiển JSON-RPC 2.0 — Thánh Đường Hồng Ân TikTok Live</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&family=Noto+Serif:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070d1f;
+      --card: #0e1938;
+      --border: rgba(244, 196, 78, 0.42);
+      --gold: #f4c44e;
+      --gold-light: #ffefa8;
+      --text: #fffdf7;
+      --muted: #cbbf9a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 50% 0%, #162b63 0%, #060b1a 80%);
+      color: var(--text);
+      font-family: 'Be Vietnam Pro', sans-serif;
+      min-height: 100vh;
+      padding: 28px;
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 24px;
+    }
+    .top-title {
+      font-family: 'Noto Serif', serif;
+      font-size: 26px;
+      color: var(--gold-light);
+    }
+    .top-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .top-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #1b3475 0%, #0f1f4a 100%);
+      color: var(--gold-light);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn.gold {
+      background: linear-gradient(180deg, #f4c44e 0%, #c48814 100%);
+      color: #09122c;
+      border-color: #fff3b0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .card h2 {
+      font-size: 18px;
+      color: var(--gold-light);
+      border-bottom: 1px solid rgba(244, 196, 78, 0.22);
+      padding-bottom: 10px;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+    input, select, textarea {
+      width: 100%;
+      background: #070d20;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+    }
+    .action-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    pre {
+      background: #040814;
+      border: 1px solid rgba(244, 196, 78, 0.25);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12.5px;
+      color: #9ef0c0;
+      overflow-x: auto;
+      max-height: 280px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="top-bar">
+      <div>
+        <div class="top-title">⛪ BẢNG ĐIỀU KHIỂN THÁNH ĐƯỜNG HỒNG ÂN ONLINE — TIKTOK LIVE RPC</div>
+        <div class="top-sub" id="statusBanner">Đang tải trạng thái Thánh Đường...</div>
+      </div>
+      <div class="top-links">
+        <a class="btn" href="/admin">🪷 Sang Admin Chùa</a>
+        <a class="btn" href="/church?obs=1" target="_blank">📺 Màn Hình OBS 9:16 Sạch (?obs=1)</a>
+        <a class="btn gold" href="/church" target="_blank">⛪ Mở Màn Hình Nhà Thờ 9:16</a>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section class="card" style="grid-column: 1 / -1; border-color: rgba(244, 196, 78, 0.85); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid rgba(244, 196, 78, 0.22); padding-bottom: 10px;">
+          <div>
+            <h2 style="border: none; padding: 0; font-size: 19px;">🎙️ Trung Tâm Xướng Tên Khán Giả Tặng Quà & Bình Luận (Giọng Mai Chi Tức Thì)</h2>
+            <p style="font-size: 12.5px; color: var(--muted); margin-top: 3px;">
+              <strong>Chống trượt 100%:</strong> Khi chuột đang đặt trong bảng nào thì bảng đó <strong>đứng yên tuyệt đối</strong>, gộp chung nhiều quà của cùng 1 người vào 1 dòng, và <strong>tự nạp sẵn giọng đọc trước</strong> để bấm là đọc ngay!
+            </p>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <span id="queueStatusBadge" style="font-size: 12.5px; padding: 6px 12px; border-radius: 999px; background: rgba(244, 196, 78, 0.14); border: 1px solid rgba(244, 196, 78, 0.4); color: #ffefa8;">
+              🔊 Trạng thái: Sẵn sàng đọc ngay
+            </span>
+            <button type="button" class="btn gold" id="btnToggleAutoGift" style="padding: 8px 14px; font-size: 13px;">
+              ⚡ Tự động xướng Quà To / Combo x3+: ĐANG BẬT
+            </button>
+            <button type="button" class="btn" id="btnFreezeGiftList" style="padding: 8px 14px; font-size: 13px;">
+              🔒 Khóa bảng Quà: TẮT
+            </button>
+            <button type="button" class="btn" id="btnFreezeCommentList" style="padding: 8px 14px; font-size: 13px;">
+              🔒 Khóa bảng Bình Luận: TẮT
+            </button>
+          </div>
+        </div>
+
+        <!-- Thanh gõ nhanh tên khán giả bất kỳ để xướng tên tức thì -->
+        <div class="row" style="background: rgba(244, 196, 78, 0.08); padding: 10px 12px; border-radius: 12px; border: 1px dashed rgba(244, 196, 78, 0.4); align-items: center; flex-wrap: wrap;">
+          <input type="text" id="quickViewerName" placeholder="✍️ Nhập nhanh tên khán giả (VD: Bích Liễu, Ngọc Trinh, Lee Adam...)" style="flex: 1.1; min-width: 200px;" />
+          <input type="text" id="quickViewerGiftOrWish" placeholder="Món quà hoặc lời cầu nguyện (VD: Hoa Hồng / Cầu bình an)" style="flex: 1.4; min-width: 220px;" />
+          <button type="button" class="btn gold" id="btnQuickAnnounceGift" style="white-space: nowrap; padding: 10px 14px;">
+            🎁 Xướng Tên Tặng Quà Ngay
+          </button>
+          <button type="button" class="btn" id="btnQuickAnnounceWish" style="white-space: nowrap; padding: 10px 14px;">
+            🙏 Xướng Tên Cầu Nguyện Ngay
+          </button>
+        </div>
+
+        <!-- Bố cục 2 cột độc lập: Cột Trái = Khán Giả Tặng Quà (Ghim cố định), Cột Phải = Bình Luận Cầu Nguyện -->
+        <div style="display: grid; grid-template-columns: 1.08fr 1fr; gap: 16px;">
+          <!-- CỘT TRÁI: KHÁN GIẢ TẶNG QUÀ & ÂN NHÂN -->
+          <div id="giftPanelCard" style="background: rgba(20, 12, 34, 0.55); border: 1.5px solid rgba(255, 196, 78, 0.55); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <strong style="color: #ffe484; font-size: 14.5px;">🌹 1. KHÁN GIẢ TẶNG QUÀ (Tự Đứng Yên Khi Di Chuột Vào)</strong>
+              <span id="giftCountBadge" style="font-size: 12px; color: var(--muted);">0 ân nhân</span>
+            </div>
+            <div
+              id="adminGiftList"
+              style="height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;"
+            >
+              <div class="empty-placeholder" style="color: var(--muted); font-size: 13px;">Đang chờ khán giả tặng quà trên Live...</div>
+            </div>
+          </div>
+
+          <!-- CỘT PHẢI: BÌNH LUẬN CẦU NGUYỆN CỦA KHÁN GIẢ -->
+          <div id="commentPanelCard" style="background: rgba(8, 17, 40, 0.65); border: 1px solid rgba(244, 196, 78, 0.32); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <strong style="color: #cfe6ff; font-size: 14.5px;">💬 2. BÌNH LUẬN KHÁN GIẢ (Tự Đứng Yên Khi Di Chuột Vào)</strong>
+              <span id="commentCountBadge" style="font-size: 12px; color: var(--muted);">0 bình luận</span>
+            </div>
+            <div
+              id="adminCommentList"
+              style="height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;"
+            >
+              <div class="empty-placeholder" style="color: var(--muted); font-size: 13px;">Chưa có bình luận nào...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>📡 1. Kết Nối Phòng TikTok Live & Giọng Đọc ZeroTTS</h2>
+        <div class="row">
+          <input type="text" id="ttUser" placeholder="Nhập @username TikTok đang phát Live..." />
+          <button class="btn gold" id="btnConn">Kết Nối Live</button>
+          <button class="btn" id="btnDisc">Ngắt</button>
+        </div>
+        <div class="row">
+          <input type="text" id="ttsDirectText" value="Nhân danh Cha và Con và Thánh Thần. Amen. Thánh Đường Hồng Ân Online xin kính chào quý cộng đoàn." />
+          <button class="btn gold" id="btnSpeakMaiChi">🎙️ Đọc thử Giọng AI</button>
+        </div>
+        <audio id="adminAudioPreview" controls style="width: 100%; height: 38px;"></audio>
+      </section>
+
+      <section class="card">
+        <h2>✝️ 2. Gửi Lệnh Phụng Vụ JSON-RPC 2.0 (`church.*`)</h2>
+        <div class="row">
+          <input type="text" id="rpcUser" value="Ân Nhân Maria Nguyễn Thảo" placeholder="Tên tín hữu..." />
+          <input type="text" id="rpcWish" value="Xin Chúa chúc lành cho gia đình luôn bình an, mạnh khỏe" placeholder="Ý nguyện dâng Chúa..." />
+        </div>
+        <div class="action-grid">
+          <button class="btn gold" onclick="sendRpc('church.lightCandle', { count: 3 })">🕯️ Thắp 3 Ngọn Nến</button>
+          <button class="btn" onclick="sendRpc('church.sendPrayer', {})">🕊️ Thả Bồ Câu Nguyện</button>
+          <button class="btn" onclick="sendRpc('church.prayRosary', { count: 10 })">📿 Lần 10 Hạt Mân Côi</button>
+          <button class="btn" onclick="sendRpc('church.ringChurchBell', { count: 1, readTts: true })">🔔 Chuông Thánh Đường</button>
+          <button class="btn" onclick="sendRpc('church.drawBibleBlessing', {})">📜 Hái Lộc Thánh Lời Chúa</button>
+          <button class="btn" onclick="sendRpc('church.offerGift', { giftType: 'lily', coins: 30, giftName: 'Bó Hoa Huệ Trắng Tinh Khôi' })">🌹 Dâng Hoa Huệ Trắng</button>
+          <button class="btn gold" onclick="sendRpc('church.grandBlessing', { coins: 500, giftName: 'Đại Lễ Ánh Sáng Phục Sinh & Phép Lành Trọng Thể' })">👼 Đại Lễ Phép Lành</button>
+          <button class="btn" onclick="sendRpc('church.requestScripture', { scriptureId: document.getElementById('adminScriptureSelect').value })">📖 Thỉnh Lời Chúa (+15 ÂP)</button>
+          <button class="btn" onclick="sendRpc('church.resetGrace', {})">♻️ Đặt Lại Bảng Ân Phúc</button>
+        </div>
+        <div class="row" style="margin-top: 4px;">
+          <select id="adminScriptureSelect" onchange="sendRpc('church.controlScripture', { scriptureId: this.value, verseIndex: 0 })">
+            <option value="kinh_hoa_binh">✝️ Kinh Hòa Bình — Thánh Phanxicô Assisi (32 câu)</option>
+            <option value="thanh_vinh_23">📖 Thánh Vịnh 23, 91 & 121 — Chúa Chăn Dắt Tôi (32 câu)</option>
+            <option value="tam_moi_phuc_that">🕊️ Tin Mừng Mátthêu — Tám Mối Phúc Thật (32 câu)</option>
+            <option value="bai_ca_duc_ai">❤️ Thư Thánh Phaolô — Bài Ca Đức Ái (32 câu)</option>
+            <option value="kinh_cau_binh_an_gia_dinh">🌹 Kinh Phó Dâng Gia Đình & Thảo Kính Cha Mẹ (32 câu)</option>
+            <option value="suy_niem_chua_quan_phong">✨ Suy Niệm Tin Mừng — Bình An Chúa Quan Phòng (32 câu)</option>
+            <option value="kinh_long_chua_thuong_xot">🙏 Kinh Lòng Chúa Thương Xót & Chuỗi Tín Thác (32 câu)</option>
+            <option value="kinh_man_coi_duc_me">📿 Chuỗi Kinh Mân Côi & Kinh Đức Mẹ Maria (32 câu)</option>
+            <option value="kinh_thanh_giuse_cong_viec">🛠️ Kinh Ông Thánh Giuse — Cầu Công Việc & Gia Đình (32 câu)</option>
+            <option value="kinh_toi_gia_dinh">🌙 Giờ Kinh Tối Gia Đình — Tạ Ơn & Ngủ Bình An (32 câu)</option>
+          </select>
+          <select id="adminScriptureVoice" onchange="sendRpc('church.controlScripture', { voice: this.value })">
+            <option value="huuduc">🎙️ Giọng Hữu Đức (Nam Trầm)</option>
+            <option value="quangminh">🎙️ Giọng Quang Minh (Nam Trang Nghiêm)</option>
+            <option value="tiendat">🎙️ Giọng Tiến Đạt (Nam Điềm Đạm)</option>
+            <option value="maichi">🎙️ Giọng Mai Chi (Nữ Truyền Cảm)</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>💬 3. Giả Lập Bình Luận Giáo Dân Trên TikTok Live</h2>
+        <div class="row">
+          <input type="text" id="simComment" value="Con xin hái một Lộc Thánh Lời Chúa cầu bình an cho gia đình ạ. Amen!" placeholder="Nhập nội dung bình luận TikTok..." />
+          <button class="btn gold" id="btnSendComment">Gửi Comment</button>
+        </div>
+        <p style="font-size: 13px; color: var(--muted);">
+          Từ khóa tự động nhận diện: <code>thắp nến</code>, <code>tạ ơn chúa</code>, <code>amen / alleluia</code>, <code>hái lộc / lộc thánh / câu gốc</code>, <code>chuông</code>, <code>mân côi / lần hạt / kính mừng</code>, <code>lời chúa / kinh hòa bình / thánh vịnh / tám mối phúc / đức ái</code>.
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>🔌 4. Nhật Ký Phản Hồi JSON-RPC 2.0 (`/rpc`)</h2>
+        <pre id="rpcOutput">{ "status": "Sẵn sàng nhận lệnh JSON-RPC 2.0 (church.*)" }</pre>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    async function sendRpc(method, extraParams = {}) {
+      const user = document.getElementById('rpcUser').value.trim() || 'Tín Hữu';
+      const wish = document.getElementById('rpcWish').value.trim();
+      const body = {
+        jsonrpc: '2.0',
+        id: Date.now(),
+        method,
+        params: { user, wish, ...extraParams }
+      };
+      const res = await fetch('/rpc', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      document.getElementById('rpcOutput').textContent = JSON.stringify(data, null, 2);
+      return data;
+    }
+
+    document.getElementById('btnConn').onclick = () => {
+      const username = document.getElementById('ttUser').value.trim();
+      sendRpc('church.connect', { username });
+    };
+    document.getElementById('btnDisc').onclick = () => sendRpc('church.disconnect', {});
+    document.getElementById('btnSendComment').onclick = () => {
+      const comment = document.getElementById('simComment').value.trim();
+      sendRpc('church.comment', { comment });
+    };
+    document.getElementById('btnSpeakMaiChi').onclick = async () => {
+      const text = document.getElementById('ttsDirectText').value.trim();
+      triggerImmediateAnnouncement({
+        id: 'manual_' + Date.now(),
+        user: 'Thánh Đường Hồng Ân',
+        wish: text,
+        customText: text
+      });
+    };
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // =========================================================================
+    // HỆ THỐNG XƯỚNG TÊN TỨC THÌ (CHỐNG TRƯỢT 100% + NẠP SẴN GIỌNG + ĐỌC ĐÚNG NGƯỜI VỪA BẤM)
+    // =========================================================================
+    try {
+      sessionStorage.removeItem('church_admin_gift_events_v2');
+    } catch (_) {}
+    const GIFT_STORAGE_KEY = 'church_admin_gift_events_v3';
+
+    let giftEvents = [];
+    let commentEvents = [];
+    const seenEventIds = new Set();
+    const prewarmedUrlMap = new Map(); // id -> audioUrl đã nạp sẵn
+    const announcedIds = new Set();
+    let currentSpeakingId = '';
+    let latestClickToken = 0;
+
+    let autoAnnounceGifts = true;
+    const autoAnnounceQueue = [];
+    let freezeGifts = false;
+    let freezeComments = false;
+    let isHoveringGiftCard = false;
+    let isHoveringCommentCard = false;
+
+    // Kiểm tra xem món quà có thuộc diện TỰ ĐỘNG XƯỚNG TÊN (Combo >= x3, tích lũy đủ bội số x3, hoặc Món Quà To >= 5 xu / khác Hoa Hồng đơn lẻ)
+    function shouldAutoAnnounceGift(ev, comboTotal = 1) {
+      if (!ev) return false;
+      if (ev.type === 'grandBlessing') return true;
+      const coins = Number(ev.coins || 0);
+      if (coins >= 5) return true;
+
+      const rawGift = String(ev.giftName || '').trim();
+      const multMatch = rawGift.match(/^(\d+)x\s+/i);
+      if (multMatch && Number(multMatch[1]) >= 3) return true;
+
+      if (comboTotal >= 3 && comboTotal % 3 === 0) return true;
+
+      const cleanGift = rawGift.replace(/^\d+x\s*/i, '').trim().toLowerCase();
+      if (cleanGift && cleanGift !== 'rose' && !cleanGift.includes('hoa hồng')) {
+        return true;
+      }
+      return false;
+    }
+
+    function enqueueSmartAutoGiftAnnounce(item) {
+      if (!autoAnnounceGifts || !item) return;
+      if (!currentSpeakingId) {
+        triggerImmediateAnnouncement(item);
+        return;
+      }
+      const userKey = String(item.user || '').trim().toLowerCase();
+      const existing = autoAnnounceQueue.find((q) => String(q.user || '').trim().toLowerCase() === userKey);
+      if (existing) {
+        existing.giftName = item.giftName || existing.giftName;
+        existing.comboTotal = item.comboTotal || existing.comboTotal;
+        return;
+      }
+      if (autoAnnounceQueue.length < 6) {
+        autoAnnounceQueue.push(item);
+      }
+    }
+
+    try {
+      const savedGifts = JSON.parse(sessionStorage.getItem(GIFT_STORAGE_KEY) || '[]');
+      if (Array.isArray(savedGifts)) {
+        giftEvents = savedGifts
+          .filter((g) => g && g.id && !String(g.id).startsWith('lb_donor_'))
+          .slice(0, 60);
+        giftEvents.forEach((g) => seenEventIds.add(g.id));
+      }
+    } catch (_) {}
+
+    function saveGiftEventsToSession() {
+      try {
+        sessionStorage.setItem(GIFT_STORAGE_KEY, JSON.stringify(giftEvents.slice(0, 60)));
+      } catch (_) {}
+    }
+
+    // Chuyển tên quà tiếng Anh sang tiếng Việt ngắn gọn (2 từ) để ZeroTTS đọc cực nhanh (~3.8-4.5s) và tự nhiên
+    function translateGiftNameVi(rawGift) {
+      const g = String(rawGift || '').replace(/^\d+x\s*/i, '').trim();
+      const lower = g.toLowerCase();
+      if (!g || lower.includes('rose') || lower.includes('hoa')) return 'Hoa Hồng';
+      if (lower.includes('heart') || lower.includes('tim') || lower.includes('love')) return 'Trái Tim';
+      if (lower.includes('doughnut') || lower.includes('donut') || lower.includes('cake')) return 'Bánh Ngọt';
+      if (lower.includes('hat') || lower.includes('mustache') || lower.includes('glasses')) return 'Quà Tặng';
+      if (lower.includes('perfume') || lower.includes('scent')) return 'Nước Hoa';
+      if (lower.includes('nebula') || lower.includes('galaxy') || lower.includes('star')) return 'Ánh Sao';
+      if (/^[a-z0-9\s&'-]+$/i.test(g)) return 'Lễ Vật';
+      return g.length > 16 ? 'Lễ Vật' : g;
+    }
+
+    // Làm gọn tên người xem (bỏ chuỗi số dài phía sau như 1990, 2003 để đọc tự nhiên và nhanh hơn)
+    function cleanSpokenViewerName(rawUser) {
+      let name = String(rawUser || 'Tín Hữu')
+        .replace(/[0-9]{3,}/g, '')
+        .replace(/[_.\-~!@#$%^&*()+=]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (name.length < 2) name = String(rawUser || 'Tín Hữu').trim();
+      return name.slice(0, 38);
+    }
+
+    function buildSpeechTextForItem(item) {
+      if (item.customText) {
+        return String(item.customText).replace(/[.,!?]+/g, ' ').replace(/\s+/g, ' ').trim() + '.';
+      }
+      const spokenName = cleanSpokenViewerName(item.user);
+      if (item.isGift || item.type === 'offerGift' || item.type === 'grandBlessing') {
+        const viGift = translateGiftNameVi(item.giftName);
+        if (Number(item.comboTotal) > 1) {
+          return `Cảm tạ ân nhân ${spokenName} đã tiến dâng ${item.comboTotal} phần ${viGift}. Xin Chúa chúc lành.`;
+        }
+        return `Cảm tạ ân nhân ${spokenName} đã tiến dâng ${viGift}. Xin Chúa chúc lành.`;
+      }
+      const rawWish = String(item.wish || '')
+        .replace(/[.,!?]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const isGeneric =
+        !rawWish ||
+        rawWish.toLowerCase() === 'amen' ||
+        rawWish.includes('Hiệp thông nơi Thánh Đường') ||
+        rawWish.includes('Đã bước vào Thánh Đường') ||
+        rawWish.includes('Lạy Chúa Giêsu, con tín thác vào Chúa');
+      if (isGeneric) {
+        return `Cảm tạ tín hữu ${spokenName} đã hiệp thông cầu nguyện. Amen.`;
+      }
+      let shortWish = rawWish;
+      if (shortWish.length > 180) {
+        const cut = shortWish.slice(0, 180);
+        const lastSpace = cut.lastIndexOf(' ');
+        shortWish = lastSpace > 100 ? cut.slice(0, lastSpace) : cut;
+      }
+      return `Cảm tạ tín hữu ${spokenName} cầu nguyện, ${shortWish}. Amen.`;
+    }
+
+    // Không chạy pre-warm ngầm nữa vì làm nghẽn hàng đợi ZeroTTS của server!
+    function schedulePrewarmForGift(ev) {
+      // Đã tắt để giải phóng 100% tốc độ cho cú click trực tiếp của người dùng
+    }
+    function runNextPrewarm() {}
+
+    function updateStatusBadge(text, isBusy = false) {
+      const badge = document.getElementById('queueStatusBadge');
+      if (!badge) return;
+      badge.textContent = text;
+      badge.style.background = isBusy ? 'rgba(46, 204, 113, 0.25)' : 'rgba(244, 196, 78, 0.14)';
+    }
+
+    function updateButtonStateInDom(itemId) {
+      if (!itemId) return;
+      const btns = document.querySelectorAll(`.btn-admin-announce[data-id="${CSS.escape(itemId)}"]`);
+      btns.forEach((btn) => {
+        const isGift = btn.getAttribute('data-is-gift') === '1';
+        const isReady = prewarmedUrlMap.has(itemId);
+        if (currentSpeakingId === itemId) {
+          btn.textContent = '🎙️ Đang đọc tên này...';
+          btn.classList.add('gold');
+        } else if (announcedIds.has(itemId)) {
+          btn.textContent = '✅ Đã xướng (Đọc lại)';
+          btn.classList.remove('gold');
+        } else if (isGift && isReady) {
+          btn.textContent = '⚡ Xướng tên Quà (0s)';
+          btn.classList.add('gold');
+        } else {
+          btn.textContent = isGift ? '🎁 Xướng tên Quà' : '🔊 Xướng tên';
+          btn.classList.add('gold');
+        }
+      });
+    }
+
+    // ĐỌC NGAY LẬP TỨC ĐÚNG NGƯỜI VỪA BẤM (Hủy ngay yêu cầu cũ nếu bấm sang người mới, không bao giờ đọc nhầm tên cũ!)
+    async function triggerImmediateAnnouncement(item) {
+      const myToken = ++latestClickToken;
+      const prevId = currentSpeakingId;
+      const itemId = item.id || `item_${Date.now()}`;
+      currentSpeakingId = itemId;
+      if (prevId && prevId !== itemId) updateButtonStateInDom(prevId);
+      updateButtonStateInDom(itemId);
+
+      const player = document.getElementById('adminAudioPreview');
+      if (player) {
+        try {
+          player.pause();
+        } catch (_) {}
+      }
+
+      const speechText = buildSpeechTextForItem(item);
+      const cachedUrl = prewarmedUrlMap.get(itemId);
+
+      // NẾU ĐÃ NẠP SẴN GIỌNG (0s): Phát ra loa NGAY LẬP TỨC (0.001 giây) trước cả khi gọi mạng!
+      let playedImmediately = false;
+      if (cachedUrl && player) {
+        playedImmediately = true;
+        updateStatusBadge(`⚡ Đang đọc ngay (0s): ${item.user}`, true);
+        player.src = cachedUrl;
+        player.volume = 0.95;
+        player.play().catch(() => {});
+      } else {
+        updateStatusBadge(`🎙️ Đang gọi tên: ${item.user}...`, true);
+      }
+
+      try {
+        const res = await fetch('/rpc', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: Date.now(),
+            method: 'church.announceViewer',
+            params: {
+              eventId: itemId,
+              user: item.user || 'Tín Hữu',
+              wish: item.wish || item.giftName || 'Amen',
+              text: speechText,
+              voice: 'maichi',
+              broadcast: true
+            }
+          })
+        });
+        const data = await res.json();
+
+        // Nếu trong lúc chờ người dùng đã bấm sang tên khác -> BỎ QUA NGAY tên cũ này để không bao giờ đọc nhầm!
+        if (myToken !== latestClickToken) {
+          return;
+        }
+
+        document.getElementById('rpcOutput').textContent = JSON.stringify(data, null, 2);
+
+        const audioUrl = data?.result?.url || cachedUrl;
+        if (audioUrl) {
+          prewarmedUrlMap.set(itemId, audioUrl);
+          if (!playedImmediately && player) {
+            player.src = audioUrl;
+            player.volume = 0.95;
+            await player.play().catch(() => {});
+          }
+        }
+      } catch (err) {
+        console.error('[Immediate Announce Error]', err);
+      } finally {
+        if (myToken === latestClickToken) {
+          currentSpeakingId = '';
+          announcedIds.add(itemId);
+          updateButtonStateInDom(itemId);
+          updateStatusBadge(`✅ Vừa xướng tên: ${item.user}`, false);
+          if (autoAnnounceGifts && autoAnnounceQueue.length > 0) {
+            const nextVipItem = autoAnnounceQueue.shift();
+            setTimeout(() => {
+              if (!currentSpeakingId && nextVipItem) {
+                triggerImmediateAnnouncement(nextVipItem);
+              }
+            }, 350);
+          }
+        }
+      }
+    }
+
+    function createRowElement(ev, isGiftRow) {
+      const row = document.createElement('div');
+      row.setAttribute('data-row-id', ev.id);
+      row.setAttribute('data-user-key', String(ev.user || '').toLowerCase());
+      row.style.cssText = isGiftRow
+        ? 'display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border-radius:10px; background:linear-gradient(90deg, rgba(244,196,78,0.16) 0%, rgba(255,255,255,0.05) 100%); border-left:4px solid #f4c44e;'
+        : 'display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 12px; border-radius:10px; background:rgba(255,255,255,0.05); border-left:3px solid #63a4ff;';
+
+      const countTag = ev.comboTotal && ev.comboTotal > 1 ? ` (x${ev.comboTotal})` : '';
+      const label = isGiftRow
+        ? `🌹 Tặng quà: ${ev.giftName || 'Hoa Hồng'}${countTag}`
+        : ev.wish || 'Amen';
+
+      const isSpeaking = currentSpeakingId === ev.id;
+      const isDone = announcedIds.has(ev.id);
+      const isReady = prewarmedUrlMap.has(ev.id);
+      const btnText = isSpeaking
+        ? '🎙️ Đang đọc tên này...'
+        : isDone
+          ? '✅ Đã xướng (Đọc lại)'
+          : isGiftRow && isReady
+            ? '⚡ Xướng tên Quà (0s)'
+            : isGiftRow
+              ? '🎁 Xướng tên Quà'
+              : '🔊 Xướng tên';
+
+      row.innerHTML = `
+        <div class="row-label-box" style="flex:1; min-width:0; font-size:13.5px; line-height:1.4;">
+          <strong style="color:${isGiftRow ? '#ffe484' : '#ffffff'}; font-size:14px;">${escapeHtml(ev.user)}</strong>:
+          <span class="row-desc-text" style="color:#f4ebd9;">“${escapeHtml(label)}”</span>
+        </div>
+        <button
+          type="button"
+          class="btn ${isDone && !isSpeaking ? '' : 'gold'} btn-admin-announce"
+          data-id="${escapeHtml(ev.id || '')}"
+          data-user="${escapeHtml(ev.user || '')}"
+          data-wish="${escapeHtml(ev.wish || '')}"
+          data-gift="${escapeHtml(ev.giftName || '')}"
+          data-is-gift="${isGiftRow ? '1' : '0'}"
+          style="padding:8px 13px; font-size:12.5px; white-space:nowrap; flex-shrink:0;"
+        >${btnText}</button>
+      `;
+      return row;
+    }
+
+    function syncListDom(containerId, items, isGiftList, badgeId, emptyText) {
+      const box = document.getElementById(containerId);
+      const badge = document.getElementById(badgeId);
+      if (badge) {
+        if (isGiftList && (freezeGifts || isHoveringGiftCard)) {
+          badge.textContent = `${items.length} ân nhân (🔒 Đang giữ đứng yên để bấm)`;
+          badge.style.color = '#7ef5a5';
+        } else if (!isGiftList && (freezeComments || isHoveringCommentCard)) {
+          badge.textContent = `${items.length} bình luận (🔒 Đang giữ đứng yên để bấm)`;
+          badge.style.color = '#7ef5a5';
+        } else {
+          badge.textContent = isGiftList ? `${items.length} ân nhân tặng quà` : `${items.length} bình luận`;
+          badge.style.color = 'var(--muted)';
+        }
+      }
+      if (!box) return;
+
+      // CHỐNG TRƯỢT TUYỆT ĐỐI 100%: Nếu đang đặt chuột trong bảng hoặc bật khóa, TUYỆT ĐỐI KHÔNG chèn thêm dòng mới!
+      if (isGiftList && (freezeGifts || isHoveringGiftCard || box.matches(':hover'))) {
+        return;
+      }
+      if (!isGiftList && (freezeComments || isHoveringCommentCard || box.matches(':hover'))) {
+        return;
+      }
+
+      if (!items.length) {
+        if (!box.querySelector('[data-row-id]')) {
+          box.innerHTML = `<div class="empty-placeholder" style="color: var(--muted); font-size: 13px;">${emptyText}</div>`;
+        }
+        return;
+      }
+      const placeholder = box.querySelector('.empty-placeholder');
+      if (placeholder) placeholder.remove();
+
+      for (let i = items.length - 1; i >= 0; i--) {
+        const ev = items[i];
+        if (!ev || !ev.id) continue;
+        const existing = box.querySelector(`[data-row-id="${CSS.escape(ev.id)}"]`);
+        if (!existing) {
+          const newRow = createRowElement(ev, isGiftList);
+          box.insertBefore(newRow, box.firstChild);
+        } else {
+          const descSpan = existing.querySelector('.row-desc-text');
+          if (descSpan && isGiftList) {
+            const countTag = ev.comboTotal && ev.comboTotal > 1 ? ` (x${ev.comboTotal})` : '';
+            descSpan.textContent = `“🌹 Tặng quà: ${ev.giftName || 'Hoa Hồng'}${countTag}”`;
+          }
+          updateButtonStateInDom(ev.id);
+        }
+      }
+
+      while (box.children.length > 50) {
+        box.removeChild(box.lastElementChild);
+      }
+    }
+
+    function ingestIncomingEvent(ev, fromHistory = false) {
+      if (!ev || !ev.id) return;
+      if (seenEventIds.has(ev.id)) return;
+      seenEventIds.add(ev.id);
+
+      const isGift = ev.type === 'offerGift' || ev.type === 'grandBlessing';
+      if (isGift) {
+        // GỘP CHUNG QUÀ CỦA CÙNG 1 KHÁN GIẢ VÀO 1 DÒNG DUY NHẤT để danh sách không bị nhảy khi 1 người thả liên tiếp 5-10 bông hoa!
+        const userKey = String(ev.user || '').trim().toLowerCase();
+        const multMatch = String(ev.giftName || '').match(/^(\d+)x\s+/i);
+        const burstCount = multMatch ? Math.max(1, Number(multMatch[1])) : 1;
+        const existingDonor = giftEvents.find((g) => String(g.user || '').trim().toLowerCase() === userKey);
+        if (existingDonor) {
+          existingDonor.comboTotal = (existingDonor.comboTotal || 1) + burstCount;
+          existingDonor.giftName = ev.giftName || existingDonor.giftName;
+          existingDonor.coins = Math.max(Number(existingDonor.coins || 0), Number(ev.coins || 0));
+          saveGiftEventsToSession();
+          syncListDom('adminGiftList', giftEvents, true, 'giftCountBadge', 'Đang chờ khán giả tặng quà trên Live...');
+
+          if (!fromHistory && autoAnnounceGifts && shouldAutoAnnounceGift(ev, existingDonor.comboTotal)) {
+            announcedIds.delete(existingDonor.id);
+            enqueueSmartAutoGiftAnnounce({
+              id: existingDonor.id,
+              user: existingDonor.user,
+              giftName: existingDonor.giftName || 'Hoa Hồng',
+              wish: existingDonor.wish,
+              comboTotal: existingDonor.comboTotal,
+              isGift: true
+            });
+          }
+          return;
+        }
+
+        ev.comboTotal = burstCount;
+        giftEvents.unshift(ev);
+        if (giftEvents.length > 60) giftEvents.length = 60;
+        saveGiftEventsToSession();
+
+        syncListDom(
+          'adminGiftList',
+          giftEvents,
+          true,
+          'giftCountBadge',
+          'Đang chờ khán giả tặng quà trên Live...'
+        );
+        if (!fromHistory && autoAnnounceGifts && shouldAutoAnnounceGift(ev, ev.comboTotal)) {
+          enqueueSmartAutoGiftAnnounce({
+            id: ev.id,
+            user: ev.user,
+            giftName: ev.giftName || 'Hoa Hồng',
+            wish: ev.wish,
+            comboTotal: ev.comboTotal,
+            isGift: true
+          });
+        }
+        return;
+      }
+
+      // Lọc bỏ các sự kiện tự động từ thả tim (prayRosary), vào phòng hoặc follow
+      const wishStr = String(ev.wish || '').trim();
+      if (
+        ev.type === 'prayRosary' ||
+        wishStr.includes('Đã bước vào Thánh Đường') ||
+        wishStr.includes('Hiệp thông nơi Thánh Đường, nguyện xin Chúa chúc lành')
+      ) {
+        return;
+      }
+
+      commentEvents.unshift(ev);
+      if (commentEvents.length > 50) commentEvents.length = 50;
+
+      syncListDom(
+        'adminCommentList',
+        commentEvents,
+        false,
+        'commentCountBadge',
+        'Chưa có bình luận nào...'
+      );
+    }
+
+    // Bắt sự kiện ngay từ mousedown (nhạy gấp đôi click, bấm là ăn ngay lập tức trước khi chuột kịp nhấc lên!)
+    function handleAnnounceListInteraction(e) {
+      const btn = e.target.closest('.btn-admin-announce');
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const eventId = btn.getAttribute('data-id') || '';
+      const user = btn.getAttribute('data-user') || 'Tín Hữu';
+      const wish = btn.getAttribute('data-wish') || '';
+      const giftName = btn.getAttribute('data-gift') || '';
+      const isGift = btn.getAttribute('data-is-gift') === '1';
+
+      announcedIds.delete(eventId);
+      triggerImmediateAnnouncement({
+        id: eventId,
+        user,
+        wish,
+        giftName,
+        isGift
+      });
+    }
+
+    document.getElementById('adminGiftList')?.addEventListener('mousedown', handleAnnounceListInteraction);
+    document.getElementById('adminCommentList')?.addEventListener('mousedown', handleAnnounceListInteraction);
+
+    // Tự động đóng băng tuyệt đối từng bảng khi chuột nằm trong vùng bảng đó
+    const giftCardEl = document.getElementById('giftPanelCard');
+    const commentCardEl = document.getElementById('commentPanelCard');
+
+    giftCardEl?.addEventListener('mouseenter', () => {
+      isHoveringGiftCard = true;
+      syncListDom('adminGiftList', giftEvents, true, 'giftCountBadge', 'Đang chờ khán giả tặng quà trên Live...');
+    });
+    giftCardEl?.addEventListener('mouseleave', () => {
+      isHoveringGiftCard = false;
+      syncListDom('adminGiftList', giftEvents, true, 'giftCountBadge', 'Đang chờ khán giả tặng quà trên Live...');
+    });
+
+    commentCardEl?.addEventListener('mouseenter', () => {
+      isHoveringCommentCard = true;
+      syncListDom('adminCommentList', commentEvents, false, 'commentCountBadge', 'Chưa có bình luận nào...');
+    });
+    commentCardEl?.addEventListener('mouseleave', () => {
+      isHoveringCommentCard = false;
+      syncListDom('adminCommentList', commentEvents, false, 'commentCountBadge', 'Chưa có bình luận nào...');
+    });
+
+    document.getElementById('btnToggleAutoGift')?.addEventListener('click', (e) => {
+      autoAnnounceGifts = !autoAnnounceGifts;
+      const btn = e.currentTarget;
+      btn.textContent = `⚡ Tự động xướng Quà To / Combo x3+: ${autoAnnounceGifts ? 'ĐANG BẬT' : 'TẮT'}`;
+      btn.classList.toggle('gold', autoAnnounceGifts);
+    });
+
+    document.getElementById('btnFreezeGiftList')?.addEventListener('click', (e) => {
+      freezeGifts = !freezeGifts;
+      const btn = e.currentTarget;
+      btn.textContent = `🔒 Khóa bảng Quà: ${freezeGifts ? 'ĐANG KHÓA' : 'TẮT'}`;
+      btn.classList.toggle('gold', freezeGifts);
+      syncListDom('adminGiftList', giftEvents, true, 'giftCountBadge', 'Đang chờ khán giả tặng quà trên Live...');
+    });
+
+    document.getElementById('btnFreezeCommentList')?.addEventListener('click', (e) => {
+      freezeComments = !freezeComments;
+      const btn = e.currentTarget;
+      btn.textContent = `🔒 Khóa bảng Bình Luận: ${freezeComments ? 'ĐANG KHÓA' : 'TẮT'}`;
+      btn.classList.toggle('gold', freezeComments);
+      syncListDom('adminCommentList', commentEvents, false, 'commentCountBadge', 'Chưa có bình luận nào...');
+    });
+
+    document.getElementById('btnQuickAnnounceGift')?.addEventListener('click', () => {
+      const user = document.getElementById('quickViewerName')?.value.trim() || 'Ân Nhân';
+      const giftName = document.getElementById('quickViewerGiftOrWish')?.value.trim() || 'đóa Hoa Hồng';
+      triggerImmediateAnnouncement({
+        id: 'quick_gift_' + Date.now(),
+        user,
+        giftName,
+        isGift: true
+      });
+    });
+
+    document.getElementById('btnQuickAnnounceWish')?.addEventListener('click', () => {
+      const user = document.getElementById('quickViewerName')?.value.trim() || 'Tín Hữu';
+      const wish = document.getElementById('quickViewerGiftOrWish')?.value.trim() || 'Xin Chúa chúc lành cho gia đình luôn bình an';
+      triggerImmediateAnnouncement({
+        id: 'quick_wish_' + Date.now(),
+        user,
+        wish,
+        isGift: false
+      });
+    });
+
+    function connectAdminWebSocket() {
+      const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const ws = new WebSocket(`${proto}//${window.location.host}/ws?workflow=church&role=admin`);
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.method === 'church.event' && msg.params?.event) {
+            ingestIncomingEvent(msg.params.event, false);
+          }
+        } catch (_) {}
+      };
+      ws.onclose = () => setTimeout(connectAdminWebSocket, 2500);
+    }
+    connectAdminWebSocket();
+
+    async function refreshStatus() {
+      try {
+        const res = await fetch('/api/church/state');
+        const st = await res.json();
+        document.getElementById('statusBanner').textContent =
+          `Nến đã thắp: ${st.totalCandles} | Tổng Ân Phúc: ${st.totalGrace} | Mân Côi: ${st.rosaryBeads} | ZeroTTS: ${st.tts?.status} (Giọng: ${st.tts?.voice})`;
+
+        if (Array.isArray(st.recentEvents)) {
+          for (let i = st.recentEvents.length - 1; i >= 0; i--) {
+            ingestIncomingEvent(st.recentEvents[i], true);
+          }
+        }
+
+        syncListDom(
+          'adminGiftList',
+          giftEvents,
+          true,
+          'giftCountBadge',
+          'Đang chờ khán giả tặng quà trên Live...'
+        );
+      } catch (_) {}
+    }
+    refreshStatus();
+    setInterval(refreshStatus, 2500);
+  </script>
+</body>
+</html>
